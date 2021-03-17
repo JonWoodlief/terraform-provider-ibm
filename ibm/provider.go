@@ -327,10 +327,10 @@ func Provider() *schema.Provider {
 			"ibm_tg_location":  dataSourceIBMTransitGatewaysLocation(),
 
 			// Catalog related resources
-			"ibm_cm_catalog":           resourceIBMCmCatalog(),
-			"ibm_cm_offering":          resourceIBMCmOffering(),
-			"ibm_cm_version":           resourceIBMCmVersion(),
-			"ibm_cm_offering_instance": resourceIBMCmOfferingInstance(),
+			"ibm_cm_catalog":           datasourceIBMCmCatalog(),
+			"ibm_cm_offering":          datasourceIBMCmOffering(),
+			"ibm_cm_version":           datasourceIBMCmVersion(),
+			"ibm_cm_offering_instance": datasourceIBMCmOfferingInstance(),
 		},
 
 		ResourcesMap: map[string]*schema.Resource{

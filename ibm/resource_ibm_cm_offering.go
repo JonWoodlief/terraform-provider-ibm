@@ -873,11 +873,6 @@ func resourceIBMCmOffering() *schema.Resource {
 				Computed:    true,
 				Description: "Determine if this offering should be displayed in the Consumption UI.",
 			},
-			"provider": &schema.Schema{
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "Provider of this offering.",
-			},
 			"repo_info": &schema.Schema{
 				Type:        schema.TypeList,
 				Computed:    true,
