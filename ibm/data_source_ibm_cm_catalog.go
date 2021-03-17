@@ -131,7 +131,6 @@ func dataSourceIBMCmCatalog() *schema.Resource {
 			},
 			"catalog_filters": &schema.Schema{
 				Type:        schema.TypeList,
-				MaxItems:    1,
 				Computed:    true,
 				Description: "Filters for account and catalog filters.",
 				Elem: &schema.Resource{

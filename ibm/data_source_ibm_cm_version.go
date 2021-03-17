@@ -303,7 +303,6 @@ func dataSourceIBMCmVersion() *schema.Resource {
 			},
 			"entitlement": &schema.Schema{
 				Type:        schema.TypeList,
-				MaxItems:    1,
 				Computed:    true,
 				Description: "Entitlement license info.",
 				Elem: &schema.Resource{

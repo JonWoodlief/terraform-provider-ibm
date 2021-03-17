@@ -854,11 +854,6 @@ func dataSourceIBMCmOffering() *schema.Resource {
 				Computed:    true,
 				Description: "Determine if this offering should be displayed in the Consumption UI.",
 			},
-			"provider": &schema.Schema{
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "Provider of this offering.",
-			},
 			"repo_info": &schema.Schema{
 				Type:        schema.TypeList,
 				MaxItems:    1,
@@ -1010,9 +1005,6 @@ func dataSourceIBMCmOfferingRead(context context.Context, d *schema.ResourceData
 	}
 	if err = d.Set("hidden", offering.Hidden); err != nil {
 		return diag.FromErr(fmt.Errorf("Error setting hidden: %s", err))
-	}
-	if err = d.Set("provider", offering.Provider); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting provider: %s", err))
 	}
 
 	if offering.RepoInfo != nil {
