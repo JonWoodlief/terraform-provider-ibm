@@ -1067,9 +1067,6 @@ func resourceIBMCmOfferingRead(context context.Context, d *schema.ResourceData, 
 	if err = d.Set("hidden", offering.Hidden); err != nil {
 		return diag.FromErr(fmt.Errorf("Error setting hidden: %s", err))
 	}
-	if err = d.Set("provider", offering.Provider); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting provider: %s", err))
-	}
 	if offering.RepoInfo != nil {
 		repoInfoMap := resourceIBMCmOfferingRepoInfoToMap(*offering.RepoInfo)
 		if err = d.Set("repo_info", []map[string]interface{}{repoInfoMap}); err != nil {
