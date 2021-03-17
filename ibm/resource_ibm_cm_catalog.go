@@ -340,7 +340,7 @@ func resourceIBMCmCatalogCreate(context context.Context, d *schema.ResourceData,
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	fmt.Printf("client is a nil pointer: %v\n", catalogManagementClient == nil)
+
 	log.Printf("[DEBUG] client is a nil pointer: %v\n", catalogManagementClient == nil)
 
 	createCatalogOptions := &catalogmanagementv1.CreateCatalogOptions{}
