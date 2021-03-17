@@ -172,7 +172,6 @@ func dataSourceIBMCmVersion() *schema.Resource {
 			},
 			"validation": &schema.Schema{
 				Type:        schema.TypeList,
-				MaxItems:    1,
 				Computed:    true,
 				Description: "Validation response.",
 				Elem: &schema.Resource{
@@ -234,7 +233,6 @@ func dataSourceIBMCmVersion() *schema.Resource {
 			},
 			"install": &schema.Schema{
 				Type:        schema.TypeList,
-				MaxItems:    1,
 				Computed:    true,
 				Description: "Script information.",
 				Elem: &schema.Resource{
@@ -389,7 +387,6 @@ func dataSourceIBMCmVersion() *schema.Resource {
 			},
 			"state": &schema.Schema{
 				Type:        schema.TypeList,
-				MaxItems:    1,
 				Computed:    true,
 				Description: "Offering state.",
 				Elem: &schema.Resource{

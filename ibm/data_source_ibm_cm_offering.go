@@ -97,7 +97,6 @@ func dataSourceIBMCmOffering() *schema.Resource {
 			},
 			"rating": &schema.Schema{
 				Type:        schema.TypeList,
-				MaxItems:    1,
 				Computed:    true,
 				Description: "Repository info for offerings.",
 				Elem: &schema.Resource{
@@ -856,7 +855,6 @@ func dataSourceIBMCmOffering() *schema.Resource {
 			},
 			"repo_info": &schema.Schema{
 				Type:        schema.TypeList,
-				MaxItems:    1,
 				Computed:    true,
 				Description: "Repository info for offerings.",
 				Elem: &schema.Resource{

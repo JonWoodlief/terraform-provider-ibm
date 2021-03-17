@@ -196,7 +196,6 @@ func dataSourceIBMCmCatalog() *schema.Resource {
 			},
 			"syndication_settings": &schema.Schema{
 				Type:        schema.TypeList,
-				MaxItems:    1,
 				Computed:    true,
 				Description: "Feature information.",
 				Elem: &schema.Resource{
