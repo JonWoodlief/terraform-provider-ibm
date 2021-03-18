@@ -564,6 +564,7 @@ func resourceIBMCmCatalogRead(d *schema.ResourceData, meta interface{}) error {
 	if err != nil {
 		return err
 	}
+	log.Printf("[DEBUG] client is a nil pointer: %v\n", catalogManagementClient == nil)
 
 	getCatalogOptions := &catalogmanagementv1.GetCatalogOptions{}
 
