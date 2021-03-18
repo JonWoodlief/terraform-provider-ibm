@@ -112,7 +112,7 @@ func resourceIBMCmOffering() *schema.Resource {
 			},
 			"label": &schema.Schema{
 				Type:        schema.TypeString,
-				Computed:    true,
+				Required:    true,
 				Description: "Display Name in the requested language.",
 			},
 			"name": &schema.Schema{
@@ -176,7 +176,7 @@ func resourceIBMCmOffering() *schema.Resource {
 			},
 			"short_description": &schema.Schema{
 				Type:        schema.TypeString,
-				Computed:    true,
+				Required:    true,
 				Description: "Short description in the requested language.",
 			},
 			"long_description": &schema.Schema{
