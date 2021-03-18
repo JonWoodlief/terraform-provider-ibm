@@ -17,11 +17,9 @@
 package ibm
 
 import (
-	"context"
 	"fmt"
 	"log"
 
-	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 
 	"github.com/IBM/platform-services-go-sdk/catalogmanagementv1"
@@ -29,10 +27,10 @@ import (
 
 func resourceIBMCmVersion() *schema.Resource {
 	return &schema.Resource{
-		CreateContext: resourceIBMCmVersionCreate,
-		ReadContext:   resourceIBMCmVersionRead,
-		DeleteContext: resourceIBMCmVersionDelete,
-		Importer:      &schema.ResourceImporter{},
+		Create:   resourceIBMCmVersionCreate,
+		Read:     resourceIBMCmVersionRead,
+		Delete:   resourceIBMCmVersionDelete,
+		Importer: &schema.ResourceImporter{},
 
 		Schema: map[string]*schema.Schema{
 			"catalog_identifier": &schema.Schema{
@@ -472,10 +470,10 @@ func resourceIBMCmVersion() *schema.Resource {
 	}
 }
 
-func resourceIBMCmVersionCreate(context context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
+func resourceIBMCmVersionCreate(d *schema.ResourceData, meta interface{}) error {
 	catalogManagementClient, err := meta.(ClientSession).CatalogManagementV1()
 	if err != nil {
-		return diag.FromErr(err)
+		return err
 	}
 
 	importOfferingVersionOptions := &catalogmanagementv1.ImportOfferingVersionOptions{}
@@ -504,36 +502,36 @@ func resourceIBMCmVersionCreate(context context.Context, d *schema.ResourceData,
 		importOfferingVersionOptions.SetRepoType(d.Get("repo_type").(string))
 	}
 
-	offering, response, err := catalogManagementClient.ImportOfferingVersionWithContext(context, importOfferingVersionOptions)
+	offering, response, err := catalogManagementClient.ImportOfferingVersion(importOfferingVersionOptions)
 
 	if err != nil {
-		log.Printf("[DEBUG] ImportOfferingVersionWithContext failed %s\n%s", err, response)
-		return diag.FromErr(err)
+		log.Printf("[DEBUG] ImportOfferingVersion failed %s\n%s", err, response)
+		return err
 	}
 
 	version := offering.Kinds[0].Versions[0]
 
 	d.SetId(fmt.Sprintf("%s/%s/%s", *importOfferingVersionOptions.CatalogIdentifier, *importOfferingVersionOptions.OfferingID, *version.ID))
 
-	return resourceIBMCmVersionRead(context, d, meta)
+	return resourceIBMCmVersionRead(d, meta)
 }
 
-func resourceIBMCmVersionRead(context context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
+func resourceIBMCmVersionRead(d *schema.ResourceData, meta interface{}) error {
 	catalogManagementClient, err := meta.(ClientSession).CatalogManagementV1()
 	if err != nil {
-		return diag.FromErr(err)
+		return err
 	}
 
 	getVersionOptions := &catalogmanagementv1.GetVersionOptions{}
 
 	parts, err := idParts(d.Id())
 	if err != nil {
-		return diag.FromErr(err)
+		return err
 	}
 
 	getVersionOptions.SetVersionLocID(parts[2])
 
-	offering, response, err := catalogManagementClient.GetVersionWithContext(context, getVersionOptions)
+	offering, response, err := catalogManagementClient.GetVersion(getVersionOptions)
 	version := offering.Kinds[0].Versions[0]
 
 	if err != nil {
@@ -541,39 +539,39 @@ func resourceIBMCmVersionRead(context context.Context, d *schema.ResourceData, m
 			d.SetId("")
 			return nil
 		}
-		log.Printf("[DEBUG] GetVersionWithContext failed %s\n%s", err, response)
-		return diag.FromErr(err)
+		log.Printf("[DEBUG] GetVersion failed %s\n%s", err, response)
+		return err
 	}
 
 	if err = d.Set("crn", version.CRN); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting crn: %s", err))
+		return fmt.Errorf("Error setting crn: %s", err)
 	}
 	if err = d.Set("version", version.Version); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting version: %s", err))
+		return fmt.Errorf("Error setting version: %s", err)
 	}
 	if err = d.Set("sha", version.Sha); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting sha: %s", err))
+		return fmt.Errorf("Error setting sha: %s", err)
 	}
 	if err = d.Set("created", version.Created.String()); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting created: %s", err))
+		return fmt.Errorf("Error setting created: %s", err)
 	}
 	if err = d.Set("updated", version.Updated.String()); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting updated: %s", err))
+		return fmt.Errorf("Error setting updated: %s", err)
 	}
 	if err = d.Set("catalog_id", version.CatalogID); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting catalog_id: %s", err))
+		return fmt.Errorf("Error setting catalog_id: %s", err)
 	}
 	if err = d.Set("kind_id", version.KindID); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting kind_id: %s", err))
+		return fmt.Errorf("Error setting kind_id: %s", err)
 	}
 	if err = d.Set("repo_url", version.RepoURL); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting repo_url: %s", err))
+		return fmt.Errorf("Error setting repo_url: %s", err)
 	}
 	if err = d.Set("source_url", version.SourceURL); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting source_url: %s", err))
+		return fmt.Errorf("Error setting source_url: %s", err)
 	}
 	if err = d.Set("tgz_url", version.TgzURL); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting tgz_url: %s", err))
+		return fmt.Errorf("Error setting tgz_url: %s", err)
 	}
 	if version.Configuration != nil {
 		configuration := []map[string]interface{}{}
@@ -582,7 +580,7 @@ func resourceIBMCmVersionRead(context context.Context, d *schema.ResourceData, m
 			configuration = append(configuration, configurationItemMap)
 		}
 		if err = d.Set("configuration", configuration); err != nil {
-			return diag.FromErr(fmt.Errorf("Error setting configuration: %s", err))
+			return fmt.Errorf("Error setting configuration: %s", err)
 		}
 	}
 	if version.Metadata != nil {
@@ -591,7 +589,7 @@ func resourceIBMCmVersionRead(context context.Context, d *schema.ResourceData, m
 	if version.Validation != nil {
 		validationMap := resourceIBMCmVersionValidationToMap(*version.Validation)
 		if err = d.Set("validation", []map[string]interface{}{validationMap}); err != nil {
-			return diag.FromErr(fmt.Errorf("Error setting validation: %s", err))
+			return fmt.Errorf("Error setting validation: %s", err)
 		}
 	}
 	if version.RequiredResources != nil {
@@ -601,16 +599,16 @@ func resourceIBMCmVersionRead(context context.Context, d *schema.ResourceData, m
 			requiredResources = append(requiredResources, requiredResourcesItemMap)
 		}
 		if err = d.Set("required_resources", requiredResources); err != nil {
-			return diag.FromErr(fmt.Errorf("Error setting required_resources: %s", err))
+			return fmt.Errorf("Error setting required_resources: %s", err)
 		}
 	}
 	if err = d.Set("single_instance", version.SingleInstance); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting single_instance: %s", err))
+		return fmt.Errorf("Error setting single_instance: %s", err)
 	}
 	if version.Install != nil {
 		installMap := resourceIBMCmVersionScriptToMap(*version.Install)
 		if err = d.Set("install", []map[string]interface{}{installMap}); err != nil {
-			return diag.FromErr(fmt.Errorf("Error setting install: %s", err))
+			return fmt.Errorf("Error setting install: %s", err)
 		}
 	}
 	if version.PreInstall != nil {
@@ -620,13 +618,13 @@ func resourceIBMCmVersionRead(context context.Context, d *schema.ResourceData, m
 			preInstall = append(preInstall, preInstallItemMap)
 		}
 		if err = d.Set("pre_install", preInstall); err != nil {
-			return diag.FromErr(fmt.Errorf("Error setting pre_install: %s", err))
+			return fmt.Errorf("Error setting pre_install: %s", err)
 		}
 	}
 	if version.Entitlement != nil {
 		entitlementMap := resourceIBMCmVersionVersionEntitlementToMap(*version.Entitlement)
 		if err = d.Set("entitlement", []map[string]interface{}{entitlementMap}); err != nil {
-			return diag.FromErr(fmt.Errorf("Error setting entitlement: %s", err))
+			return fmt.Errorf("Error setting entitlement: %s", err)
 		}
 	}
 	if version.Licenses != nil {
@@ -636,36 +634,36 @@ func resourceIBMCmVersionRead(context context.Context, d *schema.ResourceData, m
 			licenses = append(licenses, licensesItemMap)
 		}
 		if err = d.Set("licenses", licenses); err != nil {
-			return diag.FromErr(fmt.Errorf("Error setting licenses: %s", err))
+			return fmt.Errorf("Error setting licenses: %s", err)
 		}
 	}
 	if err = d.Set("image_manifest_url", version.ImageManifestURL); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting image_manifest_url: %s", err))
+		return fmt.Errorf("Error setting image_manifest_url: %s", err)
 	}
 	if err = d.Set("deprecated", version.Deprecated); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting deprecated: %s", err))
+		return fmt.Errorf("Error setting deprecated: %s", err)
 	}
 	if err = d.Set("package_version", version.PackageVersion); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting package_version: %s", err))
+		return fmt.Errorf("Error setting package_version: %s", err)
 	}
 	if version.State != nil {
 		stateMap := resourceIBMCmVersionStateToMap(*version.State)
 		if err = d.Set("state", []map[string]interface{}{stateMap}); err != nil {
-			return diag.FromErr(fmt.Errorf("Error setting state: %s", err))
+			return fmt.Errorf("Error setting state: %s", err)
 		}
 	}
 	if err = d.Set("version_locator", version.VersionLocator); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting version_locator: %s", err))
+		return fmt.Errorf("Error setting version_locator: %s", err)
 	}
 	if err = d.Set("console_url", version.ConsoleURL); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting console_url: %s", err))
+		return fmt.Errorf("Error setting console_url: %s", err)
 	}
 	if err = d.Set("long_description", version.LongDescription); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting long_description: %s", err))
+		return fmt.Errorf("Error setting long_description: %s", err)
 	}
 	if version.WhitelistedAccounts != nil {
 		if err = d.Set("whitelisted_accounts", version.WhitelistedAccounts); err != nil {
-			return diag.FromErr(fmt.Errorf("Error setting whitelisted_accounts: %s", err))
+			return fmt.Errorf("Error setting whitelisted_accounts: %s", err)
 		}
 	}
 
@@ -766,25 +764,25 @@ func resourceIBMCmVersionStateToMap(state catalogmanagementv1.State) map[string]
 	return stateMap
 }
 
-func resourceIBMCmVersionDelete(context context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
+func resourceIBMCmVersionDelete(d *schema.ResourceData, meta interface{}) error {
 	catalogManagementClient, err := meta.(ClientSession).CatalogManagementV1()
 	if err != nil {
-		return diag.FromErr(err)
+		return err
 	}
 
 	deleteVersionOptions := &catalogmanagementv1.DeleteVersionOptions{}
 
 	parts, err := idParts(d.Id())
 	if err != nil {
-		return diag.FromErr(err)
+		return err
 	}
 
 	deleteVersionOptions.SetVersionLocID(parts[2])
 
-	response, err := catalogManagementClient.DeleteVersionWithContext(context, deleteVersionOptions)
+	response, err := catalogManagementClient.DeleteVersion(deleteVersionOptions)
 	if err != nil {
-		log.Printf("[DEBUG] DeleteVersionWithContext failed %s\n%s", err, response)
-		return diag.FromErr(err)
+		log.Printf("[DEBUG] DeleteVersion failed %s\n%s", err, response)
+		return err
 	}
 
 	d.SetId("")

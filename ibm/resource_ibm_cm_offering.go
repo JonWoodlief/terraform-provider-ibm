@@ -17,11 +17,9 @@
 package ibm
 
 import (
-	"context"
 	"fmt"
 	"log"
 
-	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 
 	"github.com/IBM/platform-services-go-sdk/catalogmanagementv1"
@@ -29,10 +27,10 @@ import (
 
 func resourceIBMCmOffering() *schema.Resource {
 	return &schema.Resource{
-		CreateContext: resourceIBMCmOfferingCreate,
-		ReadContext:   resourceIBMCmOfferingRead,
-		DeleteContext: resourceIBMCmOfferingDelete,
-		Importer:      &schema.ResourceImporter{},
+		Create:   resourceIBMCmOfferingCreate,
+		Read:     resourceIBMCmOfferingRead,
+		Delete:   resourceIBMCmOfferingDelete,
+		Importer: &schema.ResourceImporter{},
 
 		Schema: map[string]*schema.Schema{
 			"catalog_identifier": &schema.Schema{
@@ -896,10 +894,10 @@ func resourceIBMCmOffering() *schema.Resource {
 	}
 }
 
-func resourceIBMCmOfferingCreate(context context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
+func resourceIBMCmOfferingCreate(d *schema.ResourceData, meta interface{}) error {
 	catalogManagementClient, err := meta.(ClientSession).CatalogManagementV1()
 	if err != nil {
-		return diag.FromErr(err)
+		return err
 	}
 
 	importOfferingOptions := &catalogmanagementv1.ImportOfferingOptions{}
@@ -933,83 +931,83 @@ func resourceIBMCmOfferingCreate(context context.Context, d *schema.ResourceData
 		importOfferingOptions.SetXAuthToken(d.Get("x_auth_token").(string))
 	}
 
-	offering, response, err := catalogManagementClient.ImportOfferingWithContext(context, importOfferingOptions)
+	offering, response, err := catalogManagementClient.ImportOffering(importOfferingOptions)
 	if err != nil {
 		log.Printf("[DEBUG] ImportOfferingWithContext failed %s\n%s", err, response)
-		return diag.FromErr(err)
+		return err
 	}
 
 	d.SetId(fmt.Sprintf("%s/%s", *importOfferingOptions.CatalogIdentifier, *offering.ID))
 
-	return resourceIBMCmOfferingRead(context, d, meta)
+	return resourceIBMCmOfferingRead(d, meta)
 }
 
-func resourceIBMCmOfferingRead(context context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
+func resourceIBMCmOfferingRead(d *schema.ResourceData, meta interface{}) error {
 	catalogManagementClient, err := meta.(ClientSession).CatalogManagementV1()
 	if err != nil {
-		return diag.FromErr(err)
+		return err
 	}
 
 	getOfferingOptions := &catalogmanagementv1.GetOfferingOptions{}
 
 	parts, err := idParts(d.Id())
 	if err != nil {
-		return diag.FromErr(err)
+		return err
 	}
 
 	getOfferingOptions.SetCatalogIdentifier(parts[0])
 	getOfferingOptions.SetOfferingID(parts[1])
 
-	offering, response, err := catalogManagementClient.GetOfferingWithContext(context, getOfferingOptions)
+	offering, response, err := catalogManagementClient.GetOffering(getOfferingOptions)
 	if err != nil {
 		if response != nil && response.StatusCode == 404 {
 			d.SetId("")
 			return nil
 		}
 		log.Printf("[DEBUG] GetOfferingWithContext failed %s\n%s", err, response)
-		return diag.FromErr(err)
+		return err
 	}
 	if err = d.Set("offering_id", offering.ID); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting offering_id: %s", err))
+		return fmt.Errorf("Error setting offering_id: %s", err)
 	}
 	if err = d.Set("url", offering.URL); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting url: %s", err))
+		return fmt.Errorf("Error setting url: %s", err)
 	}
 	if err = d.Set("crn", offering.CRN); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting crn: %s", err))
+		return fmt.Errorf("Error setting crn: %s", err)
 	}
 	if err = d.Set("label", offering.Label); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting label: %s", err))
+		return fmt.Errorf("Error setting label: %s", err)
 	}
 	if err = d.Set("name", offering.Name); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting name: %s", err))
+		return fmt.Errorf("Error setting name: %s", err)
 	}
 	if err = d.Set("offering_icon_url", offering.OfferingIconURL); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting offering_icon_url: %s", err))
+		return fmt.Errorf("Error setting offering_icon_url: %s", err)
 	}
 	if err = d.Set("offering_docs_url", offering.OfferingDocsURL); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting offering_docs_url: %s", err))
+		return fmt.Errorf("Error setting offering_docs_url: %s", err)
 	}
 	if err = d.Set("offering_support_url", offering.OfferingSupportURL); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting offering_support_url: %s", err))
+		return fmt.Errorf("Error setting offering_support_url: %s", err)
 	}
 	if offering.Rating != nil {
 		ratingMap := resourceIBMCmOfferingRatingToMap(*offering.Rating)
 		if err = d.Set("rating", []map[string]interface{}{ratingMap}); err != nil {
-			return diag.FromErr(fmt.Errorf("Error setting rating: %s", err))
+			return fmt.Errorf("Error setting rating: %s", err)
 		}
 	}
 	if err = d.Set("created", offering.Created.String()); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting created: %s", err))
+		return fmt.Errorf("Error setting created: %s", err)
 	}
 	if err = d.Set("updated", offering.Updated.String()); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting updated: %s", err))
+		return fmt.Errorf("Error setting updated: %s", err)
 	}
 	if err = d.Set("short_description", offering.ShortDescription); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting short_description: %s", err))
+		return fmt.Errorf("Error setting short_description: %s", err)
 	}
 	if err = d.Set("long_description", offering.LongDescription); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting long_description: %s", err))
+		return fmt.Errorf("Error setting long_description: %s", err)
 	}
 	if offering.Features != nil {
 		features := []map[string]interface{}{}
@@ -1018,7 +1016,7 @@ func resourceIBMCmOfferingRead(context context.Context, d *schema.ResourceData, 
 			features = append(features, featuresItemMap)
 		}
 		if err = d.Set("features", features); err != nil {
-			return diag.FromErr(fmt.Errorf("Error setting features: %s", err))
+			return fmt.Errorf("Error setting features: %s", err)
 		}
 	}
 	if offering.Kinds != nil {
@@ -1028,49 +1026,49 @@ func resourceIBMCmOfferingRead(context context.Context, d *schema.ResourceData, 
 			kinds = append(kinds, kindsItemMap)
 		}
 		if err = d.Set("kinds", kinds); err != nil {
-			return diag.FromErr(fmt.Errorf("Error setting kinds: %s", err))
+			return fmt.Errorf("Error setting kinds: %s", err)
 		}
 	}
 	if err = d.Set("permit_request_ibm_public_publish", offering.PermitRequestIBMPublicPublish); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting permit_request_ibm_public_publish: %s", err))
+		return fmt.Errorf("Error setting permit_request_ibm_public_publish: %s", err)
 	}
 	if err = d.Set("ibm_publish_approved", offering.IBMPublishApproved); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting ibm_publish_approved: %s", err))
+		return fmt.Errorf("Error setting ibm_publish_approved: %s", err)
 	}
 	if err = d.Set("public_publish_approved", offering.PublicPublishApproved); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting public_publish_approved: %s", err))
+		return fmt.Errorf("Error setting public_publish_approved: %s", err)
 	}
 	if err = d.Set("public_original_crn", offering.PublicOriginalCRN); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting public_original_crn: %s", err))
+		return fmt.Errorf("Error setting public_original_crn: %s", err)
 	}
 	if err = d.Set("publish_public_crn", offering.PublishPublicCRN); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting publish_public_crn: %s", err))
+		return fmt.Errorf("Error setting publish_public_crn: %s", err)
 	}
 	if err = d.Set("portal_approval_record", offering.PortalApprovalRecord); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting portal_approval_record: %s", err))
+		return fmt.Errorf("Error setting portal_approval_record: %s", err)
 	}
 	if err = d.Set("portal_ui_url", offering.PortalUIURL); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting portal_ui_url: %s", err))
+		return fmt.Errorf("Error setting portal_ui_url: %s", err)
 	}
 	if err = d.Set("catalog_id", offering.CatalogID); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting catalog_id: %s", err))
+		return fmt.Errorf("Error setting catalog_id: %s", err)
 	}
 	if err = d.Set("catalog_name", offering.CatalogName); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting catalog_name: %s", err))
+		return fmt.Errorf("Error setting catalog_name: %s", err)
 	}
 	if offering.Metadata != nil {
 		// TODO: handle Metadata of type TypeMap -- not primitive type, not list
 	}
 	if err = d.Set("disclaimer", offering.Disclaimer); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting disclaimer: %s", err))
+		return fmt.Errorf("Error setting disclaimer: %s", err)
 	}
 	if err = d.Set("hidden", offering.Hidden); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting hidden: %s", err))
+		return fmt.Errorf("Error setting hidden: %s", err)
 	}
 	if offering.RepoInfo != nil {
 		repoInfoMap := resourceIBMCmOfferingRepoInfoToMap(*offering.RepoInfo)
 		if err = d.Set("repo_info", []map[string]interface{}{repoInfoMap}); err != nil {
-			return diag.FromErr(fmt.Errorf("Error setting repo_info: %s", err))
+			return fmt.Errorf("Error setting repo_info: %s", err)
 		}
 	}
 
@@ -1383,26 +1381,26 @@ func resourceIBMCmOfferingRepoInfoToMap(repoInfo catalogmanagementv1.RepoInfo) m
 	return repoInfoMap
 }
 
-func resourceIBMCmOfferingDelete(context context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
+func resourceIBMCmOfferingDelete(d *schema.ResourceData, meta interface{}) error {
 	catalogManagementClient, err := meta.(ClientSession).CatalogManagementV1()
 	if err != nil {
-		return diag.FromErr(err)
+		return err
 	}
 
 	deleteOfferingOptions := &catalogmanagementv1.DeleteOfferingOptions{}
 
 	parts, err := idParts(d.Id())
 	if err != nil {
-		return diag.FromErr(err)
+		return err
 	}
 
 	deleteOfferingOptions.SetCatalogIdentifier(parts[0])
 	deleteOfferingOptions.SetOfferingID(parts[1])
 
-	response, err := catalogManagementClient.DeleteOfferingWithContext(context, deleteOfferingOptions)
+	response, err := catalogManagementClient.DeleteOffering(deleteOfferingOptions)
 	if err != nil {
 		log.Printf("[DEBUG] DeleteOfferingWithContext failed %s\n%s", err, response)
-		return diag.FromErr(err)
+		return err
 	}
 
 	d.SetId("")

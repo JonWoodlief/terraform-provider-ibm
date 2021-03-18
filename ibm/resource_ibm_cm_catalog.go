@@ -843,7 +843,7 @@ func resourceIBMCmCatalogDelete(d *schema.ResourceData, meta interface{}) error 
 
 	response, err := catalogManagementClient.DeleteCatalog(deleteCatalogOptions)
 	if err != nil {
-		log.Printf("[DEBUG] DeleteCatalogWithContext failed %s\n%s", err, response)
+		log.Printf("[DEBUG] DeleteCatalog failed %s\n%s", err, response)
 		return err
 	}
 
