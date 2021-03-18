@@ -114,7 +114,7 @@ func resourceIBMCmOffering() *schema.Resource {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Display Name in the requested language.",
-				ForceNew:    false,
+				ForceNew:    true,
 			},
 			"name": &schema.Schema{
 				Type:        schema.TypeString,
@@ -178,13 +178,13 @@ func resourceIBMCmOffering() *schema.Resource {
 			"short_description": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
-				ForceNew:    false,
+				ForceNew:    true,
 				Description: "Short description in the requested language.",
 			},
 			"long_description": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
-				ForceNew:    false,
+				ForceNew:    true,
 				Description: "Long description in the requested language.",
 			},
 			"features": &schema.Schema{
