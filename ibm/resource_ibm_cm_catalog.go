@@ -387,7 +387,7 @@ func resourceIBMCmCatalogCreate(d *schema.ResourceData, meta interface{}) error 
 
 	catalog, response, err := catalogManagementClient.CreateCatalog(createCatalogOptions)
 	if err != nil {
-		log.Printf("[DEBUG] CreateCatalogWithContext failed %s\n%s", err, response)
+		log.Printf("[DEBUG] CreateCatalog failed %s\n%s", err, response)
 		return err
 	}
 
@@ -575,7 +575,7 @@ func resourceIBMCmCatalogRead(d *schema.ResourceData, meta interface{}) error {
 			d.SetId("")
 			return nil
 		}
-		log.Printf("[DEBUG] GetCatalogWithContext failed %s\n%s", err, response)
+		log.Printf("[DEBUG] GetCatalog failed %s\n%s", err, response)
 		return err
 	}
 
@@ -824,7 +824,7 @@ func resourceIBMCmCatalogUpdate(d *schema.ResourceData, meta interface{}) error 
 
 	_, response, err := catalogManagementClient.ReplaceCatalog(replaceCatalogOptions)
 	if err != nil {
-		log.Printf("[DEBUG] ReplaceCatalogWithContext failed %s\n%s", err, response)
+		log.Printf("[DEBUG] ReplaceCatalog failed %s\n%s", err, response)
 		return err
 	}
 
