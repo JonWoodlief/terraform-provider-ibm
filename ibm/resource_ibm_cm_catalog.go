@@ -17,11 +17,9 @@
 package ibm
 
 import (
-	"context"
 	"fmt"
 	"log"
 
-	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 
 	"github.com/IBM/go-sdk-core/v5/core"
@@ -30,11 +28,11 @@ import (
 
 func resourceIBMCmCatalog() *schema.Resource {
 	return &schema.Resource{
-		CreateContext: resourceIBMCmCatalogCreate,
-		ReadContext:   resourceIBMCmCatalogRead,
-		UpdateContext: resourceIBMCmCatalogUpdate,
-		DeleteContext: resourceIBMCmCatalogDelete,
-		Importer:      &schema.ResourceImporter{},
+		Create:   resourceIBMCmCatalogCreate,
+		Read:     resourceIBMCmCatalogRead,
+		Update:   resourceIBMCmCatalogUpdate,
+		Delete:   resourceIBMCmCatalogDelete,
+		Importer: &schema.ResourceImporter{},
 
 		Schema: map[string]*schema.Schema{
 			"rev": &schema.Schema{
@@ -335,10 +333,10 @@ func resourceIBMCmCatalog() *schema.Resource {
 	}
 }
 
-func resourceIBMCmCatalogCreate(context context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
+func resourceIBMCmCatalogCreate(d *schema.ResourceData, meta interface{}) error {
 	catalogManagementClient, err := meta.(ClientSession).CatalogManagementV1()
 	if err != nil {
-		return diag.FromErr(err)
+		return err
 	}
 
 	log.Printf("[DEBUG] client is a nil pointer: %v\n", catalogManagementClient == nil)
@@ -387,15 +385,15 @@ func resourceIBMCmCatalogCreate(context context.Context, d *schema.ResourceData,
 		createCatalogOptions.SetSyndicationSettings(&syndicationSettings)
 	}
 
-	catalog, response, err := catalogManagementClient.CreateCatalogWithContext(context, createCatalogOptions)
+	catalog, response, err := catalogManagementClient.CreateCatalog(createCatalogOptions)
 	if err != nil {
 		log.Printf("[DEBUG] CreateCatalogWithContext failed %s\n%s", err, response)
-		return diag.FromErr(err)
+		return err
 	}
 
 	d.SetId(*catalog.ID)
 
-	return resourceIBMCmCatalogRead(context, d, meta)
+	return resourceIBMCmCatalogRead(d, meta)
 }
 
 func resourceIBMCmCatalogMapToFeature(featureMap map[string]interface{}) catalogmanagementv1.Feature {
@@ -561,41 +559,41 @@ func resourceIBMCmCatalogMapToSyndicationAuthorization(syndicationAuthorizationM
 	return syndicationAuthorization
 }
 
-func resourceIBMCmCatalogRead(context context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
+func resourceIBMCmCatalogRead(d *schema.ResourceData, meta interface{}) error {
 	catalogManagementClient, err := meta.(ClientSession).CatalogManagementV1()
 	if err != nil {
-		return diag.FromErr(err)
+		return err
 	}
 
 	getCatalogOptions := &catalogmanagementv1.GetCatalogOptions{}
 
 	getCatalogOptions.SetCatalogIdentifier(d.Id())
 
-	catalog, response, err := catalogManagementClient.GetCatalogWithContext(context, getCatalogOptions)
+	catalog, response, err := catalogManagementClient.GetCatalog(getCatalogOptions)
 	if err != nil {
 		if response != nil && response.StatusCode == 404 {
 			d.SetId("")
 			return nil
 		}
 		log.Printf("[DEBUG] GetCatalogWithContext failed %s\n%s", err, response)
-		return diag.FromErr(err)
+		return err
 	}
 
 	if err = d.Set("rev", catalog.Rev); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting rev: %s", err))
+		return fmt.Errorf("Error setting rev: %s", err)
 	}
 	if err = d.Set("label", catalog.Label); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting label: %s", err))
+		return fmt.Errorf("Error setting label: %s", err)
 	}
 	if err = d.Set("short_description", catalog.ShortDescription); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting short_description: %s", err))
+		return fmt.Errorf("Error setting short_description: %s", err)
 	}
 	if err = d.Set("catalog_icon_url", catalog.CatalogIconURL); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting catalog_icon_url: %s", err))
+		return fmt.Errorf("Error setting catalog_icon_url: %s", err)
 	}
 	if catalog.Tags != nil {
 		if err = d.Set("tags", catalog.Tags); err != nil {
-			return diag.FromErr(fmt.Errorf("Error setting tags: %s", err))
+			return fmt.Errorf("Error setting tags: %s", err)
 		}
 	}
 	if catalog.Features != nil {
@@ -605,44 +603,44 @@ func resourceIBMCmCatalogRead(context context.Context, d *schema.ResourceData, m
 			features = append(features, featuresItemMap)
 		}
 		if err = d.Set("features", features); err != nil {
-			return diag.FromErr(fmt.Errorf("Error setting features: %s", err))
+			return fmt.Errorf("Error setting features: %s", err)
 		}
 	}
 	if err = d.Set("disabled", catalog.Disabled); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting disabled: %s", err))
+		return fmt.Errorf("Error setting disabled: %s", err)
 	}
 	if err = d.Set("resource_group_id", catalog.ResourceGroupID); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting resource_group_id: %s", err))
+		return fmt.Errorf("Error setting resource_group_id: %s", err)
 	}
 	if err = d.Set("owning_account", catalog.OwningAccount); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting owning_account: %s", err))
+		return fmt.Errorf("Error setting owning_account: %s", err)
 	}
 	if catalog.CatalogFilters != nil {
 		catalogFiltersMap := resourceIBMCmCatalogFiltersToMap(*catalog.CatalogFilters)
 		if err = d.Set("catalog_filters", []map[string]interface{}{catalogFiltersMap}); err != nil {
-			return diag.FromErr(fmt.Errorf("Error setting catalog_filters: %s", err))
+			return fmt.Errorf("Error setting catalog_filters: %s", err)
 		}
 	}
 	if catalog.SyndicationSettings != nil {
 		syndicationSettingsMap := resourceIBMCmCatalogSyndicationResourceToMap(*catalog.SyndicationSettings)
 		if err = d.Set("syndication_settings", []map[string]interface{}{syndicationSettingsMap}); err != nil {
-			return diag.FromErr(fmt.Errorf("Error setting syndication_settings: %s", err))
+			return fmt.Errorf("Error setting syndication_settings: %s", err)
 		}
 	}
 	if err = d.Set("url", catalog.URL); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting url: %s", err))
+		return fmt.Errorf("Error setting url: %s", err)
 	}
 	if err = d.Set("crn", catalog.CRN); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting crn: %s", err))
+		return fmt.Errorf("Error setting crn: %s", err)
 	}
 	if err = d.Set("offerings_url", catalog.OfferingsURL); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting offerings_url: %s", err))
+		return fmt.Errorf("Error setting offerings_url: %s", err)
 	}
 	if err = d.Set("created", catalog.Created.String()); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting created: %s", err))
+		return fmt.Errorf("Error setting created: %s", err)
 	}
 	if err = d.Set("updated", catalog.Updated.String()); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting updated: %s", err))
+		return fmt.Errorf("Error setting updated: %s", err)
 	}
 
 	return nil
@@ -779,10 +777,10 @@ func resourceIBMCmCatalogSyndicationAuthorizationToMap(syndicationAuthorization 
 	return syndicationAuthorizationMap
 }
 
-func resourceIBMCmCatalogUpdate(context context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
+func resourceIBMCmCatalogUpdate(d *schema.ResourceData, meta interface{}) error {
 	catalogManagementClient, err := meta.(ClientSession).CatalogManagementV1()
 	if err != nil {
-		return diag.FromErr(err)
+		return err
 	}
 
 	replaceCatalogOptions := &catalogmanagementv1.ReplaceCatalogOptions{}
@@ -830,29 +828,29 @@ func resourceIBMCmCatalogUpdate(context context.Context, d *schema.ResourceData,
 		replaceCatalogOptions.SetSyndicationSettings(&syndicationSettings)
 	}
 
-	_, response, err := catalogManagementClient.ReplaceCatalogWithContext(context, replaceCatalogOptions)
+	_, response, err := catalogManagementClient.ReplaceCatalog(replaceCatalogOptions)
 	if err != nil {
 		log.Printf("[DEBUG] ReplaceCatalogWithContext failed %s\n%s", err, response)
-		return diag.FromErr(err)
+		return err
 	}
 
-	return resourceIBMCmCatalogRead(context, d, meta)
+	return resourceIBMCmCatalogRead(d, meta)
 }
 
-func resourceIBMCmCatalogDelete(context context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
+func resourceIBMCmCatalogDelete(d *schema.ResourceData, meta interface{}) error {
 	catalogManagementClient, err := meta.(ClientSession).CatalogManagementV1()
 	if err != nil {
-		return diag.FromErr(err)
+		return err
 	}
 
 	deleteCatalogOptions := &catalogmanagementv1.DeleteCatalogOptions{}
 
 	deleteCatalogOptions.SetCatalogIdentifier(d.Id())
 
-	response, err := catalogManagementClient.DeleteCatalogWithContext(context, deleteCatalogOptions)
+	response, err := catalogManagementClient.DeleteCatalog(deleteCatalogOptions)
 	if err != nil {
 		log.Printf("[DEBUG] DeleteCatalogWithContext failed %s\n%s", err, response)
-		return diag.FromErr(err)
+		return err
 	}
 
 	d.SetId("")
