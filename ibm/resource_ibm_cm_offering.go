@@ -29,7 +29,6 @@ func resourceIBMCmOffering() *schema.Resource {
 	return &schema.Resource{
 		Create:   resourceIBMCmOfferingCreate,
 		Read:     resourceIBMCmOfferingRead,
-		Update:   resourceIBMCmOfferingUpdate,
 		Delete:   resourceIBMCmOfferingDelete,
 		Importer: &schema.ResourceImporter{},
 
@@ -855,7 +854,7 @@ func resourceIBMCmOfferingCreate(d *schema.ResourceData, meta interface{}) error
 		return err
 	}
 
-	createOfferingOptions := &catalogmanagementv1.ImportOfferingOptions{}
+	createOfferingOptions := &catalogmanagementv1.CreateOfferingOptions{}
 
 	createOfferingOptions.SetCatalogIdentifier(d.Get("catalog_identifier").(string))
 	if _, ok := d.GetOk("label"); ok {
@@ -882,7 +881,7 @@ func resourceIBMCmOfferingCreate(d *schema.ResourceData, meta interface{}) error
 	if _, ok := d.GetOk("long_description"); ok {
 		createOfferingOptions.SetLongDescription(d.Get("long_description").(string))
 	}
-	if _, ok := d.GetOk("features"); ok {
+	/* 	if _, ok := d.GetOk("features"); ok {
 		var features []catalogmanagementv1.Feature
 		for _, e := range d.Get("features").([]interface{}) {
 			value := e.(map[string]interface{})
@@ -890,7 +889,7 @@ func resourceIBMCmOfferingCreate(d *schema.ResourceData, meta interface{}) error
 			features = append(features, featuresItem)
 		}
 		createOfferingOptions.SetFeatures(features)
-	}
+	} */
 	if _, ok := d.GetOk("permit_request_ibm_public_publish"); ok {
 		createOfferingOptions.SetPermitRequestIBMPublicPublish(d.Get("permit_request_ibm_public_publish").(bool))
 	}
@@ -901,7 +900,7 @@ func resourceIBMCmOfferingCreate(d *schema.ResourceData, meta interface{}) error
 		return err
 	}
 
-	d.SetId(fmt.Sprintf("%s/%s", *importOfferingOptions.CatalogIdentifier, *offering.ID))
+	d.SetId(fmt.Sprintf("%s/%s", *createOfferingOptions.CatalogIdentifier, *offering.ID))
 
 	return resourceIBMCmOfferingRead(d, meta)
 }
