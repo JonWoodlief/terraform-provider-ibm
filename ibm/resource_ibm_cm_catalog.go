@@ -621,12 +621,6 @@ func resourceIBMCmCatalogRead(d *schema.ResourceData, meta interface{}) error {
 			return fmt.Errorf("Error setting catalog_filters: %s", err)
 		}
 	}
-	if catalog.SyndicationSettings != nil {
-		syndicationSettingsMap := resourceIBMCmCatalogSyndicationResourceToMap(*catalog.SyndicationSettings)
-		if err = d.Set("syndication_settings", []map[string]interface{}{syndicationSettingsMap}); err != nil {
-			return fmt.Errorf("Error setting syndication_settings: %s", err)
-		}
-	}
 	if err = d.Set("url", catalog.URL); err != nil {
 		return fmt.Errorf("Error setting url: %s", err)
 	}
