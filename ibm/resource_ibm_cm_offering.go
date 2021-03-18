@@ -84,6 +84,7 @@ func resourceIBMCmOffering() *schema.Resource {
 			"tags": &schema.Schema{
 				Type:        schema.TypeList,
 				Optional:    true,
+				ForceNew:    true,
 				Description: "List of tags associated with this catalog.",
 				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
