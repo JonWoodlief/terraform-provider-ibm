@@ -67,7 +67,7 @@ func resourceIBMCmOffering() *schema.Resource {
 			},
 			"offering_id": &schema.Schema{
 				Type:        schema.TypeString,
-				Optional:    true,
+				Computed:    true,
 				ForceNew:    true,
 				Description: "Re-use the specified offeringID during import.",
 			},
@@ -117,7 +117,7 @@ func resourceIBMCmOffering() *schema.Resource {
 			},
 			"name": &schema.Schema{
 				Type:        schema.TypeString,
-				Computed:    true,
+				Required:    true,
 				Description: "The programmatic name of this offering.",
 			},
 			"offering_icon_url": &schema.Schema{
@@ -176,12 +176,12 @@ func resourceIBMCmOffering() *schema.Resource {
 			},
 			"short_description": &schema.Schema{
 				Type:        schema.TypeString,
-				Required:    true,
+				Optional:    true,
 				Description: "Short description in the requested language.",
 			},
 			"long_description": &schema.Schema{
 				Type:        schema.TypeString,
-				Computed:    true,
+				Optional:    true,
 				Description: "Long description in the requested language.",
 			},
 			"features": &schema.Schema{
