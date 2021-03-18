@@ -29,6 +29,7 @@ func resourceIBMCmOffering() *schema.Resource {
 	return &schema.Resource{
 		Create:   resourceIBMCmOfferingCreate,
 		Read:     resourceIBMCmOfferingRead,
+		Update:   resourceIBMCmOfferingUpdate,
 		Delete:   resourceIBMCmOfferingDelete,
 		Importer: &schema.ResourceImporter{},
 
@@ -38,62 +39,6 @@ func resourceIBMCmOffering() *schema.Resource {
 				Required:    true,
 				ForceNew:    true,
 				Description: "Catalog identifier.",
-			},
-			"tags": &schema.Schema{
-				Type:        schema.TypeList,
-				Optional:    true,
-				ForceNew:    true,
-				Description: "Tags array.",
-				Elem:        &schema.Schema{Type: schema.TypeString},
-			},
-			"target_kinds": &schema.Schema{
-				Type:        schema.TypeList,
-				Optional:    true,
-				ForceNew:    true,
-				Description: "Target kinds.  Current valid values are 'iks', 'roks', 'vcenter', and 'terraform'.",
-				Elem:        &schema.Schema{Type: schema.TypeString},
-			},
-			"content": &schema.Schema{
-				Type:        schema.TypeString,
-				Optional:    true,
-				ForceNew:    true,
-				Description: "byte array representing the content to be imported.  Only supported for OVA images at this time.",
-			},
-			"zipurl": &schema.Schema{
-				Type:        schema.TypeString,
-				Optional:    true,
-				ForceNew:    true,
-				Description: "URL path to zip location.  If not specified, must provide content in this post body.",
-			},
-			"offering_id": &schema.Schema{
-				Type:        schema.TypeString,
-				Computed:    true,
-				ForceNew:    true,
-				Description: "Re-use the specified offeringID during import.",
-			},
-			"target_version": &schema.Schema{
-				Type:        schema.TypeString,
-				Optional:    true,
-				ForceNew:    true,
-				Description: "The semver value for this new version.",
-			},
-			"include_config": &schema.Schema{
-				Type:        schema.TypeBool,
-				Optional:    true,
-				ForceNew:    true,
-				Description: "Add all possible configuration items when creating this version.",
-			},
-			"repo_type": &schema.Schema{
-				Type:        schema.TypeString,
-				Optional:    true,
-				ForceNew:    true,
-				Description: "The type of repository containing this version.  Valid values are 'public_git' or 'enterprise_git'.",
-			},
-			"x_auth_token": &schema.Schema{
-				Type:        schema.TypeString,
-				Optional:    true,
-				ForceNew:    true,
-				Description: "Authentication token used to access the specified zip file.",
 			},
 			"rev": &schema.Schema{
 				Type:        schema.TypeString,
@@ -136,6 +81,12 @@ func resourceIBMCmOffering() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "URL to be displayed in the Consumption UI for getting support on this offering.",
+			},
+			"tags": &schema.Schema{
+				Type:        schema.TypeList,
+				Optional:    true,
+				Description: "List of tags associated with this catalog.",
+				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
 			"rating": &schema.Schema{
 				Type:        schema.TypeList,
@@ -904,40 +855,49 @@ func resourceIBMCmOfferingCreate(d *schema.ResourceData, meta interface{}) error
 		return err
 	}
 
-	importOfferingOptions := &catalogmanagementv1.ImportOfferingOptions{}
+	createOfferingOptions := &catalogmanagementv1.ImportOfferingOptions{}
 
-	importOfferingOptions.SetCatalogIdentifier(d.Get("catalog_identifier").(string))
+	createOfferingOptions.SetCatalogIdentifier(d.Get("catalog_identifier").(string))
+	if _, ok := d.GetOk("label"); ok {
+		createOfferingOptions.SetLabel(d.Get("label").(string))
+	}
+	if _, ok := d.GetOk("name"); ok {
+		createOfferingOptions.SetName(d.Get("name").(string))
+	}
+	if _, ok := d.GetOk("offering_icon_url"); ok {
+		createOfferingOptions.SetOfferingIconURL(d.Get("offering_icon_url").(string))
+	}
+	if _, ok := d.GetOk("offering_docs_url"); ok {
+		createOfferingOptions.SetOfferingDocsURL(d.Get("offering_docs_url").(string))
+	}
+	if _, ok := d.GetOk("offering_support_url"); ok {
+		createOfferingOptions.SetOfferingSupportURL(d.Get("offering_support_url").(string))
+	}
 	if _, ok := d.GetOk("tags"); ok {
-		importOfferingOptions.SetTags(d.Get("tags").([]string))
+		createOfferingOptions.SetTags(d.Get("tags").([]string))
 	}
-	if _, ok := d.GetOk("target_kinds"); ok {
-		importOfferingOptions.SetTargetKinds(d.Get("target_kinds").([]string))
+	if _, ok := d.GetOk("short_description"); ok {
+		createOfferingOptions.SetShortDescription(d.Get("short_description").(string))
 	}
-	if _, ok := d.GetOk("content"); ok {
-
+	if _, ok := d.GetOk("long_description"); ok {
+		createOfferingOptions.SetLongDescription(d.Get("long_description").(string))
 	}
-	if _, ok := d.GetOk("zipurl"); ok {
-		importOfferingOptions.SetZipurl(d.Get("zipurl").(string))
+	if _, ok := d.GetOk("features"); ok {
+		var features []catalogmanagementv1.Feature
+		for _, e := range d.Get("features").([]interface{}) {
+			value := e.(map[string]interface{})
+			featuresItem := resourceIBMCmOfferingMapToFeature(value)
+			features = append(features, featuresItem)
+		}
+		createOfferingOptions.SetFeatures(features)
 	}
-	if _, ok := d.GetOk("offering_id"); ok {
-		importOfferingOptions.SetOfferingID(d.Get("offering_id").(string))
-	}
-	if _, ok := d.GetOk("target_version"); ok {
-		importOfferingOptions.SetTargetVersion(d.Get("target_version").(string))
-	}
-	if _, ok := d.GetOk("include_config"); ok {
-		importOfferingOptions.SetIncludeConfig(d.Get("include_config").(bool))
-	}
-	if _, ok := d.GetOk("repo_type"); ok {
-		importOfferingOptions.SetRepoType(d.Get("repo_type").(string))
-	}
-	if _, ok := d.GetOk("x_auth_token"); ok {
-		importOfferingOptions.SetXAuthToken(d.Get("x_auth_token").(string))
+	if _, ok := d.GetOk("permit_request_ibm_public_publish"); ok {
+		createOfferingOptions.SetPermitRequestIBMPublicPublish(d.Get("permit_request_ibm_public_publish").(bool))
 	}
 
-	offering, response, err := catalogManagementClient.ImportOffering(importOfferingOptions)
+	offering, response, err := catalogManagementClient.CreateOffering(createOfferingOptions)
 	if err != nil {
-		log.Printf("[DEBUG] ImportOfferingWithContext failed %s\n%s", err, response)
+		log.Printf("[DEBUG] CreateOffering failed %s\n%s", err, response)
 		return err
 	}
 

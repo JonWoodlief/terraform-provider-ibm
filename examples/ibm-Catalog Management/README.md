@@ -46,15 +46,36 @@ cm_offering resource:
 ```hcl
 resource "cm_offering" "cm_offering_instance" {
   catalog_identifier = var.cm_offering_catalog_identifier
+  rev = var.cm_offering_rev
+  url = var.cm_offering_url
+  crn = var.cm_offering_crn
+  label = var.cm_offering_label
+  name = var.cm_offering_name
+  offering_icon_url = var.cm_offering_offering_icon_url
+  offering_docs_url = var.cm_offering_offering_docs_url
+  offering_support_url = var.cm_offering_offering_support_url
   tags = var.cm_offering_tags
-  target_kinds = var.cm_offering_target_kinds
-  content = var.cm_offering_content
-  zipurl = var.cm_offering_zipurl
-  offering_id = var.cm_offering_offering_id
-  target_version = var.cm_offering_target_version
-  include_config = var.cm_offering_include_config
-  repo_type = var.cm_offering_repo_type
-  x_auth_token = var.cm_offering_x_auth_token
+  rating = var.cm_offering_rating
+  created = var.cm_offering_created
+  updated = var.cm_offering_updated
+  short_description = var.cm_offering_short_description
+  long_description = var.cm_offering_long_description
+  features = var.cm_offering_features
+  kinds = var.cm_offering_kinds
+  permit_request_ibm_public_publish = var.cm_offering_permit_request_ibm_public_publish
+  ibm_publish_approved = var.cm_offering_ibm_publish_approved
+  public_publish_approved = var.cm_offering_public_publish_approved
+  public_original_crn = var.cm_offering_public_original_crn
+  publish_public_crn = var.cm_offering_publish_public_crn
+  portal_approval_record = var.cm_offering_portal_approval_record
+  portal_ui_url = var.cm_offering_portal_ui_url
+  catalog_id = var.cm_offering_catalog_id
+  catalog_name = var.cm_offering_catalog_name
+  metadata = var.cm_offering_metadata
+  disclaimer = var.cm_offering_disclaimer
+  hidden = var.cm_offering_hidden
+  provider = var.cm_offering_provider
+  repo_info = var.cm_offering_repo_info
 }
 ```
 cm_version resource:
@@ -160,15 +181,36 @@ data "cm_offering_instance" "cm_offering_instance_instance" {
 | catalog_filters | Filters for account and catalog filters. | `` | false |
 | syndication_settings | Feature information. | `` | false |
 | catalog_identifier | Catalog identifier. | `string` | true |
-| tags | Tags array. | `list(string)` | false |
-| target_kinds | Target kinds.  Current valid values are 'iks', 'roks', 'vcenter', and 'terraform'. | `list(string)` | false |
-| content | byte array representing the content to be imported.  Only supported for OVA images at this time. | `` | false |
-| zipurl | URL path to zip location.  If not specified, must provide content in this post body. | `string` | false |
-| offering_id | Re-use the specified offeringID during import. | `string` | false |
-| target_version | The semver value for this new version. | `string` | false |
-| include_config | Add all possible configuration items when creating this version. | `bool` | false |
-| repo_type | The type of repository containing this version.  Valid values are 'public_git' or 'enterprise_git'. | `string` | false |
-| x_auth_token | Authentication token used to access the specified zip file. | `string` | false |
+| rev | Cloudant revision. | `string` | false |
+| url | The url for this specific offering. | `string` | false |
+| crn | The crn for this specific offering. | `string` | false |
+| label | Display Name in the requested language. | `string` | false |
+| name | The programmatic name of this offering. | `string` | false |
+| offering_icon_url | URL for an icon associated with this offering. | `string` | false |
+| offering_docs_url | URL for an additional docs with this offering. | `string` | false |
+| offering_support_url | URL to be displayed in the Consumption UI for getting support on this offering. | `string` | false |
+| tags | List of tags associated with this catalog. | `list(string)` | false |
+| rating | Repository info for offerings. | `` | false |
+| created | The date and time this catalog was created. | `` | false |
+| updated | The date and time this catalog was last updated. | `` | false |
+| short_description | Short description in the requested language. | `string` | false |
+| long_description | Long description in the requested language. | `string` | false |
+| features | list of features associated with this offering. | `list()` | false |
+| kinds | Array of kind. | `list()` | false |
+| permit_request_ibm_public_publish | Is it permitted to request publishing to IBM or Public. | `bool` | false |
+| ibm_publish_approved | Indicates if this offering has been approved for use by all IBMers. | `bool` | false |
+| public_publish_approved | Indicates if this offering has been approved for use by all IBM Cloud users. | `bool` | false |
+| public_original_crn | The original offering CRN that this publish entry came from. | `string` | false |
+| publish_public_crn | The crn of the public catalog entry of this offering. | `string` | false |
+| portal_approval_record | The portal's approval record ID. | `string` | false |
+| portal_ui_url | The portal UI URL. | `string` | false |
+| catalog_id | The id of the catalog containing this offering. | `string` | false |
+| catalog_name | The name of the catalog. | `string` | false |
+| metadata | Map of metadata values for this offering. | `map()` | false |
+| disclaimer | A disclaimer for this offering. | `string` | false |
+| hidden | Determine if this offering should be displayed in the Consumption UI. | `bool` | false |
+| provider | Provider of this offering. | `string` | false |
+| repo_info | Repository info for offerings. | `` | false |
 | catalog_identifier | Catalog identifier. | `string` | true |
 | offering_id | Offering identification. | `string` | true |
 | tags | Tags array. | `list(string)` | false |

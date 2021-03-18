@@ -20,15 +20,36 @@ resource "ibm_cm_catalog" "cm_catalog_instance" {
 // Provision cm_offering resource instance
 resource "ibm_cm_offering" "cm_offering_instance" {
   catalog_identifier = var.cm_offering_catalog_identifier
+  rev = var.cm_offering_rev
+  url = var.cm_offering_url
+  crn = var.cm_offering_crn
+  label = var.cm_offering_label
+  name = var.cm_offering_name
+  offering_icon_url = var.cm_offering_offering_icon_url
+  offering_docs_url = var.cm_offering_offering_docs_url
+  offering_support_url = var.cm_offering_offering_support_url
   tags = var.cm_offering_tags
-  target_kinds = var.cm_offering_target_kinds
-  content = var.cm_offering_content
-  zipurl = var.cm_offering_zipurl
-  offering_id = var.cm_offering_offering_id
-  target_version = var.cm_offering_target_version
-  include_config = var.cm_offering_include_config
-  repo_type = var.cm_offering_repo_type
-  x_auth_token = var.cm_offering_x_auth_token
+  rating = var.cm_offering_rating
+  created = var.cm_offering_created
+  updated = var.cm_offering_updated
+  short_description = var.cm_offering_short_description
+  long_description = var.cm_offering_long_description
+  features = var.cm_offering_features
+  kinds = var.cm_offering_kinds
+  permit_request_ibm_public_publish = var.cm_offering_permit_request_ibm_public_publish
+  ibm_publish_approved = var.cm_offering_ibm_publish_approved
+  public_publish_approved = var.cm_offering_public_publish_approved
+  public_original_crn = var.cm_offering_public_original_crn
+  publish_public_crn = var.cm_offering_publish_public_crn
+  portal_approval_record = var.cm_offering_portal_approval_record
+  portal_ui_url = var.cm_offering_portal_ui_url
+  catalog_id = var.cm_offering_catalog_id
+  catalog_name = var.cm_offering_catalog_name
+  metadata = var.cm_offering_metadata
+  disclaimer = var.cm_offering_disclaimer
+  hidden = var.cm_offering_hidden
+  provider = var.cm_offering_provider
+  repo_info = var.cm_offering_repo_info
 }
 
 // Provision cm_version resource instance

@@ -99,15 +99,36 @@ Create, update, or delete an cm_offering.
 ```
 resource "ibm_cm_offering" "cm_offering" {
   catalog_identifier = "catalog_identifier"
+  rev = "placeholder"
+  url = "placeholder"
+  crn = "placeholder"
+  label = "placeholder"
+  name = "placeholder"
+  offering_icon_url = "placeholder"
+  offering_docs_url = "placeholder"
+  offering_support_url = "placeholder"
   tags = [ "placeholder" ]
-  target_kinds = [ "placeholder" ]
-  content = 
-  zipurl = "placeholder"
-  offering_id = "placeholder"
-  target_version = "placeholder"
-  include_config = false
-  repo_type = "placeholder"
-  x_auth_token = "placeholder"
+  rating = var.cm_offering_rating
+  created = 
+  updated = 
+  short_description = "placeholder"
+  long_description = "placeholder"
+  features = var.cm_offering_features
+  kinds = var.cm_offering_kinds
+  permit_request_ibm_public_publish = false
+  ibm_publish_approved = false
+  public_publish_approved = false
+  public_original_crn = "placeholder"
+  publish_public_crn = "placeholder"
+  portal_approval_record = "placeholder"
+  portal_ui_url = "placeholder"
+  catalog_id = "placeholder"
+  catalog_name = "placeholder"
+  metadata = 
+  disclaimer = "placeholder"
+  hidden = false
+  provider = "placeholder"
+  repo_info = var.cm_offering_repo_info
 }
 ```
 
@@ -118,16 +139,37 @@ Review the input parameters that you can specify for your resource. {: shortdesc
 
 |Name|Data type|Required/optional|Description|Forces new resource|
 |----|-----------|-------|----------|--------------------|
-|`catalog_identifier`|String|Required|Catalog identifier.|Yes|
-|`tags`|List|Optional|Tags array.|Yes|
-|`target_kinds`|List|Optional|Target kinds.  Current valid values are 'iks', 'roks', 'vcenter', and 'terraform'.|Yes|
-|`content`|String|Optional|byte array representing the content to be imported.  Only supported for OVA images at this time.|Yes|
-|`zipurl`|String|Optional|URL path to zip location.  If not specified, must provide content in this post body.|Yes|
-|`offering_id`|String|Optional|Re-use the specified offeringID during import.|Yes|
-|`target_version`|String|Optional|The semver value for this new version.|Yes|
-|`include_config`|Boolean|Optional|Add all possible configuration items when creating this version.|Yes|
-|`repo_type`|String|Optional|The type of repository containing this version.  Valid values are 'public_git' or 'enterprise_git'.|Yes|
-|`x_auth_token`|String|Optional|Authentication token used to access the specified zip file.|Yes|
+|`catalog_identifier`|String|Required|Catalog identifier.|No|
+|`rev`|String|Optional|Cloudant revision.|No|
+|`url`|String|Optional|The url for this specific offering.|No|
+|`crn`|String|Optional|The crn for this specific offering.|No|
+|`label`|String|Optional|Display Name in the requested language.|No|
+|`name`|String|Optional|The programmatic name of this offering.|No|
+|`offering_icon_url`|String|Optional|URL for an icon associated with this offering.|No|
+|`offering_docs_url`|String|Optional|URL for an additional docs with this offering.|No|
+|`offering_support_url`|String|Optional|URL to be displayed in the Consumption UI for getting support on this offering.|No|
+|`tags`|List|Optional|List of tags associated with this catalog.|No|
+|`rating`|List|Optional|Repository info for offerings. You can specify one item in this list only.|No|
+|`created`|String|Optional|The date and time this catalog was created.|No|
+|`updated`|String|Optional|The date and time this catalog was last updated.|No|
+|`short_description`|String|Optional|Short description in the requested language.|No|
+|`long_description`|String|Optional|Long description in the requested language.|No|
+|`features`|List|Optional|list of features associated with this offering.|No|
+|`kinds`|List|Optional|Array of kind.|No|
+|`permit_request_ibm_public_publish`|Boolean|Optional|Is it permitted to request publishing to IBM or Public.|No|
+|`ibm_publish_approved`|Boolean|Optional|Indicates if this offering has been approved for use by all IBMers.|No|
+|`public_publish_approved`|Boolean|Optional|Indicates if this offering has been approved for use by all IBM Cloud users.|No|
+|`public_original_crn`|String|Optional|The original offering CRN that this publish entry came from.|No|
+|`publish_public_crn`|String|Optional|The crn of the public catalog entry of this offering.|No|
+|`portal_approval_record`|String|Optional|The portal's approval record ID.|No|
+|`portal_ui_url`|String|Optional|The portal UI URL.|No|
+|`catalog_id`|String|Optional|The id of the catalog containing this offering.|No|
+|`catalog_name`|String|Optional|The name of the catalog.|No|
+|`metadata`|Map|Optional|Map of metadata values for this offering.|No|
+|`disclaimer`|String|Optional|A disclaimer for this offering.|No|
+|`hidden`|Boolean|Optional|Determine if this offering should be displayed in the Consumption UI.|No|
+|`provider`|String|Optional|Provider of this offering.|No|
+|`repo_info`|List|Optional|Repository info for offerings. You can specify one item in this list only.|No|
 
 ### Output parameters
 {: #cm_offering-output}
@@ -137,149 +179,6 @@ Review the output parameters that you can access after your resource is created.
 |Name|Data type|Description|
 |----|-----------|---------|
 |`id`|String|The unique identifier of the cm_offering.|
-|`rev`|String|Cloudant revision.|
-|`url`|String|The url for this specific offering.|
-|`crn`|String|The crn for this specific offering.|
-|`label`|String|Display Name in the requested language.|
-|`name`|String|The programmatic name of this offering.|
-|`offering_icon_url`|String|URL for an icon associated with this offering.|
-|`offering_docs_url`|String|URL for an additional docs with this offering.|
-|`offering_support_url`|String|URL to be displayed in the Consumption UI for getting support on this offering.|
-|`rating`|List|Repository info for offerings. This list contains only one item.|
-|`rating.one_star_count`|Integer|One start rating.|
-|`rating.two_star_count`|Integer|Two start rating.|
-|`rating.three_star_count`|Integer|Three start rating.|
-|`rating.four_star_count`|Integer|Four start rating.|
-|`created`|String|The date and time this catalog was created.|
-|`updated`|String|The date and time this catalog was last updated.|
-|`short_description`|String|Short description in the requested language.|
-|`long_description`|String|Long description in the requested language.|
-|`features`|List|list of features associated with this offering.|
-|`features.title`|String|Heading.|
-|`features.description`|String|Feature description.|
-|`kinds`|List|Array of kind.|
-|`kinds.id`|String|Unique ID.|
-|`kinds.format_kind`|String|content kind, e.g., helm, vm image.|
-|`kinds.target_kind`|String|target cloud to install, e.g., iks, open_shift_iks.|
-|`kinds.metadata`|Map|Open ended metadata information.|
-|`kinds.install_description`|String|Installation instruction.|
-|`kinds.tags`|List|List of tags associated with this catalog.|
-|`kinds.additional_features`|List|List of features associated with this offering.|
-|`kinds.additional_features.title`|String|Heading.|
-|`kinds.additional_features.description`|String|Feature description.|
-|`kinds.created`|String|The date and time this catalog was created.|
-|`kinds.updated`|String|The date and time this catalog was last updated.|
-|`kinds.versions`|List|list of versions.|
-|`kinds.versions.id`|String|Unique ID.|
-|`kinds.versions.rev`|String|Cloudant revision.|
-|`kinds.versions.crn`|String|Version's CRN.|
-|`kinds.versions.version`|String|Version of content type.|
-|`kinds.versions.sha`|String|hash of the content.|
-|`kinds.versions.created`|String|The date and time this version was created.|
-|`kinds.versions.updated`|String|The date and time this version was last updated.|
-|`kinds.versions.offering_id`|String|Offering ID.|
-|`kinds.versions.catalog_id`|String|Catalog ID.|
-|`kinds.versions.kind_id`|String|Kind ID.|
-|`kinds.versions.tags`|List|List of tags associated with this catalog.|
-|`kinds.versions.repo_url`|String|Content's repo URL.|
-|`kinds.versions.source_url`|String|Content's source URL (e.g git repo).|
-|`kinds.versions.tgz_url`|String|File used to on-board this version.|
-|`kinds.versions.configuration`|List|List of user solicited overrides.|
-|`kinds.versions.configuration.key`|String|Configuration key.|
-|`kinds.versions.configuration.type`|String|Value type (string, boolean, int).|
-|`kinds.versions.configuration.default_value`|Map|The default value.  To use a secret when the type is password, specify a JSON encoded value of $ref:#/components/schemas/SecretInstance, prefixed with `cmsm_v1:`.|
-|`kinds.versions.configuration.value_constraint`|String|Constraint associated with value, e.g., for string type - regx:[a-z].|
-|`kinds.versions.configuration.description`|String|Key description.|
-|`kinds.versions.configuration.required`|Boolean|Is key required to install.|
-|`kinds.versions.configuration.options`|List|List of options of type.|
-|`kinds.versions.configuration.hidden`|Boolean|Hide values.|
-|`kinds.versions.metadata`|Map|Open ended metadata information.|
-|`kinds.versions.validation`|List|Validation response. This list contains only one item.|
-|`kinds.versions.validation.validated`|String|Date and time of last successful validation.|
-|`kinds.versions.validation.requested`|String|Date and time of last validation was requested.|
-|`kinds.versions.validation.state`|String|Current validation state - <empty>, in_progress, valid, invalid, expired.|
-|`kinds.versions.validation.last_operation`|String|Last operation (e.g. submit_deployment, generate_installer, install_offering.|
-|`kinds.versions.validation.target`|Map|Validation target information (e.g. cluster_id, region, namespace, etc).  Values will vary by Content type.|
-|`kinds.versions.required_resources`|List|Resource requirments for installation.|
-|`kinds.versions.required_resources.type`|String|Type of requirement.|
-|`kinds.versions.required_resources.value`|Map|mem, disk, cores, and nodes can be parsed as an int.  targetVersion will be a semver range value.|
-|`kinds.versions.single_instance`|Boolean|Denotes if single instance can be deployed to a given cluster.|
-|`kinds.versions.install`|List|Script information. This list contains only one item.|
-|`kinds.versions.install.instructions`|String|Instruction on step and by whom (role) that are needed to take place to prepare the target for installing this version.|
-|`kinds.versions.install.script`|String|Optional script that needs to be run post any pre-condition script.|
-|`kinds.versions.install.script_permission`|String|Optional iam permissions that are required on the target cluster to run this script.|
-|`kinds.versions.install.delete_script`|String|Optional script that if run will remove the installed version.|
-|`kinds.versions.install.scope`|String|Optional value indicating if this script is scoped to a namespace or the entire cluster.|
-|`kinds.versions.pre_install`|List|Optional pre-install instructions.|
-|`kinds.versions.pre_install.instructions`|String|Instruction on step and by whom (role) that are needed to take place to prepare the target for installing this version.|
-|`kinds.versions.pre_install.script`|String|Optional script that needs to be run post any pre-condition script.|
-|`kinds.versions.pre_install.script_permission`|String|Optional iam permissions that are required on the target cluster to run this script.|
-|`kinds.versions.pre_install.delete_script`|String|Optional script that if run will remove the installed version.|
-|`kinds.versions.pre_install.scope`|String|Optional value indicating if this script is scoped to a namespace or the entire cluster.|
-|`kinds.versions.entitlement`|List|Entitlement license info. This list contains only one item.|
-|`kinds.versions.entitlement.provider_name`|String|Provider name.|
-|`kinds.versions.entitlement.provider_id`|String|Provider ID.|
-|`kinds.versions.entitlement.product_id`|String|Product ID.|
-|`kinds.versions.entitlement.part_numbers`|List|list of license entitlement part numbers, eg. D1YGZLL,D1ZXILL.|
-|`kinds.versions.entitlement.image_repo_name`|String|Image repository name.|
-|`kinds.versions.licenses`|List|List of licenses the product was built with.|
-|`kinds.versions.licenses.id`|String|License ID.|
-|`kinds.versions.licenses.name`|String|license name.|
-|`kinds.versions.licenses.type`|String|type of license e.g., Apache xxx.|
-|`kinds.versions.licenses.url`|String|URL for the license text.|
-|`kinds.versions.licenses.description`|String|License description.|
-|`kinds.versions.image_manifest_url`|String|If set, denotes a url to a YAML file with list of container images used by this version.|
-|`kinds.versions.deprecated`|Boolean|read only field, indicating if this version is deprecated.|
-|`kinds.versions.package_version`|String|Version of the package used to create this version.|
-|`kinds.versions.state`|List|Offering state. This list contains only one item.|
-|`kinds.versions.state.current`|String|one of: new, validated, account-published, ibm-published, public-published.|
-|`kinds.versions.state.current_entered`|String|Date and time of current request.|
-|`kinds.versions.state.pending`|String|one of: new, validated, account-published, ibm-published, public-published.|
-|`kinds.versions.state.pending_requested`|String|Date and time of pending request.|
-|`kinds.versions.state.previous`|String|one of: new, validated, account-published, ibm-published, public-published.|
-|`kinds.versions.version_locator`|String|A dotted value of `catalogID`.`versionID`.|
-|`kinds.versions.console_url`|String|Console URL.|
-|`kinds.versions.long_description`|String|Long description for version.|
-|`kinds.versions.whitelisted_accounts`|List|Whitelisted accounts for version.|
-|`kinds.plans`|List|list of plans.|
-|`kinds.plans.id`|String|unique id.|
-|`kinds.plans.label`|String|Display Name in the requested language.|
-|`kinds.plans.name`|String|The programmatic name of this offering.|
-|`kinds.plans.short_description`|String|Short description in the requested language.|
-|`kinds.plans.long_description`|String|Long description in the requested language.|
-|`kinds.plans.metadata`|Map|open ended metadata information.|
-|`kinds.plans.tags`|List|list of tags associated with this catalog.|
-|`kinds.plans.additional_features`|List|list of features associated with this offering.|
-|`kinds.plans.additional_features.title`|String|Heading.|
-|`kinds.plans.additional_features.description`|String|Feature description.|
-|`kinds.plans.created`|String|the date'time this catalog was created.|
-|`kinds.plans.updated`|String|the date'time this catalog was last updated.|
-|`kinds.plans.deployments`|List|list of deployments.|
-|`kinds.plans.deployments.id`|String|unique id.|
-|`kinds.plans.deployments.label`|String|Display Name in the requested language.|
-|`kinds.plans.deployments.name`|String|The programmatic name of this offering.|
-|`kinds.plans.deployments.short_description`|String|Short description in the requested language.|
-|`kinds.plans.deployments.long_description`|String|Long description in the requested language.|
-|`kinds.plans.deployments.metadata`|Map|open ended metadata information.|
-|`kinds.plans.deployments.tags`|List|list of tags associated with this catalog.|
-|`kinds.plans.deployments.created`|String|the date'time this catalog was created.|
-|`kinds.plans.deployments.updated`|String|the date'time this catalog was last updated.|
-|`permit_request_ibm_public_publish`|Boolean|Is it permitted to request publishing to IBM or Public.|
-|`ibm_publish_approved`|Boolean|Indicates if this offering has been approved for use by all IBMers.|
-|`public_publish_approved`|Boolean|Indicates if this offering has been approved for use by all IBM Cloud users.|
-|`public_original_crn`|String|The original offering CRN that this publish entry came from.|
-|`publish_public_crn`|String|The crn of the public catalog entry of this offering.|
-|`portal_approval_record`|String|The portal's approval record ID.|
-|`portal_ui_url`|String|The portal UI URL.|
-|`catalog_id`|String|The id of the catalog containing this offering.|
-|`catalog_name`|String|The name of the catalog.|
-|`metadata`|Map|Map of metadata values for this offering.|
-|`disclaimer`|String|A disclaimer for this offering.|
-|`hidden`|Boolean|Determine if this offering should be displayed in the Consumption UI.|
-|`provider`|String|Provider of this offering.|
-|`repo_info`|List|Repository info for offerings. This list contains only one item.|
-|`repo_info.token`|String|Token for private repos.|
-|`repo_info.type`|String|Public or enterprise GitHub.|
 
 ### Import
 {: #cm_offering-import}
