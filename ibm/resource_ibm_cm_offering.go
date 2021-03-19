@@ -803,6 +803,7 @@ func resourceIBMCmOffering() *schema.Resource {
 			"catalog_id": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
+				ForceNew:    true,
 				Description: "The id of the catalog containing this offering.",
 			},
 			"catalog_name": &schema.Schema{
