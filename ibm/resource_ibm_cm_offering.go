@@ -802,7 +802,7 @@ func resourceIBMCmOffering() *schema.Resource {
 			},
 			"catalog_id": &schema.Schema{
 				Type:        schema.TypeString,
-				Computed:    true,
+				Required:    true,
 				Description: "The id of the catalog containing this offering.",
 			},
 			"catalog_name": &schema.Schema{
@@ -858,7 +858,7 @@ func resourceIBMCmOfferingCreate(d *schema.ResourceData, meta interface{}) error
 	createOfferingOptions := &catalogmanagementv1.CreateOfferingOptions{}
 
 	createOfferingOptions.SetCatalogIdentifier(d.Get("catalog_identifier").(string))
-	createOfferingOptions.SetCatalogID(d.Get("catalog_identifier").(string))
+	createOfferingOptions.SetCatalogID(d.Get("catalog_ID").(string))
 	if _, ok := d.GetOk("label"); ok {
 		createOfferingOptions.SetLabel(d.Get("label").(string))
 	}
