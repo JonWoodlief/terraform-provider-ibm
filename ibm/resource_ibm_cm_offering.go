@@ -856,10 +856,8 @@ func resourceIBMCmOfferingCreate(d *schema.ResourceData, meta interface{}) error
 		return err
 	}
 
-	createOfferingOptions := &catalogmanagementv1.CreateOfferingOptions{}
+	createOfferingOptions := catalogManagementClient.NewCreateOfferingOptions(d.Get("catalog_id").(string))
 
-	createOfferingOptions.SetCatalogIdentifier(d.Get("catalog_identifier").(string))
-	createOfferingOptions.SetCatalogID(d.Get("catalog_id").(string))
 	if _, ok := d.GetOk("label"); ok {
 		createOfferingOptions.SetLabel(d.Get("label").(string))
 	}
