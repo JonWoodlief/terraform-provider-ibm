@@ -30,40 +30,44 @@ func resourceIBMCmCatalog() *schema.Resource {
 	return &schema.Resource{
 		Create:   resourceIBMCmCatalogCreate,
 		Read:     resourceIBMCmCatalogRead,
-		Update:   resourceIBMCmCatalogUpdate,
 		Delete:   resourceIBMCmCatalogDelete,
 		Importer: &schema.ResourceImporter{},
 
 		Schema: map[string]*schema.Schema{
 			"rev": &schema.Schema{
 				Type:        schema.TypeString,
-				Optional:    true,
+				Computed:    true,
 				Description: "Cloudant revision.",
 			},
 			"label": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
+				ForceNew:    true,
 				Description: "Display Name in the requested language.",
 			},
 			"short_description": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
+				ForceNew:    true,
 				Description: "Description in the requested language.",
 			},
 			"catalog_icon_url": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
+				ForceNew:    true,
 				Description: "URL for an icon associated with this catalog.",
 			},
 			"tags": &schema.Schema{
 				Type:        schema.TypeList,
 				Optional:    true,
+				ForceNew:    true,
 				Description: "List of tags associated with this catalog.",
 				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
 			"features": &schema.Schema{
 				Type:        schema.TypeList,
 				Optional:    true,
+				ForceNew:    true,
 				Description: "List of features associated with this catalog.",
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
@@ -83,22 +87,25 @@ func resourceIBMCmCatalog() *schema.Resource {
 			"disabled": &schema.Schema{
 				Type:        schema.TypeBool,
 				Optional:    true,
+				ForceNew:    true,
 				Description: "Denotes whether a catalog is disabled.",
 			},
 			"resource_group_id": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
+				ForceNew:    true,
 				Description: "Resource group id the catalog is owned by.",
 			},
 			"owning_account": &schema.Schema{
 				Type:        schema.TypeString,
-				Optional:    true,
+				Computed:    true,
 				Description: "Account that owns catalog.",
 			},
 			"catalog_filters": &schema.Schema{
 				Type:        schema.TypeList,
 				MaxItems:    1,
 				Optional:    true,
+				ForceNew:    true,
 				Description: "Filters for account and catalog filters.",
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
@@ -162,6 +169,7 @@ func resourceIBMCmCatalog() *schema.Resource {
 				Type:        schema.TypeList,
 				MaxItems:    1,
 				Optional:    true,
+				ForceNew:    true,
 				Description: "Feature information.",
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
@@ -579,10 +587,6 @@ func resourceIBMCmCatalogRead(d *schema.ResourceData, meta interface{}) error {
 		log.Printf("[DEBUG] GetCatalog failed %s\n%s", err, response)
 		return err
 	}
-
-	if err = d.Set("rev", catalog.Rev); err != nil {
-		return fmt.Errorf("Error setting rev: %s", err)
-	}
 	if err = d.Set("label", catalog.Label); err != nil {
 		return fmt.Errorf("Error setting label: %s", err)
 	}
@@ -610,18 +614,18 @@ func resourceIBMCmCatalogRead(d *schema.ResourceData, meta interface{}) error {
 	if err = d.Set("disabled", catalog.Disabled); err != nil {
 		return fmt.Errorf("Error setting disabled: %s", err)
 	}
-	if err = d.Set("resource_group_id", catalog.ResourceGroupID); err != nil {
-		return fmt.Errorf("Error setting resource_group_id: %s", err)
-	}
-	if err = d.Set("owning_account", catalog.OwningAccount); err != nil {
-		return fmt.Errorf("Error setting owning_account: %s", err)
-	}
-	if catalog.CatalogFilters != nil {
-		catalogFiltersMap := resourceIBMCmCatalogFiltersToMap(*catalog.CatalogFilters)
-		if err = d.Set("catalog_filters", []map[string]interface{}{catalogFiltersMap}); err != nil {
-			return fmt.Errorf("Error setting catalog_filters: %s", err)
-		}
-	}
+	/* 	if err = d.Set("resource_group_id", catalog.ResourceGroupID); err != nil {
+	   		return fmt.Errorf("Error setting resource_group_id: %s", err)
+	   	}
+	   	if err = d.Set("owning_account", catalog.OwningAccount); err != nil {
+	   		return fmt.Errorf("Error setting owning_account: %s", err)
+	   	}
+	   	if catalog.CatalogFilters != nil {
+	   		catalogFiltersMap := resourceIBMCmCatalogFiltersToMap(*catalog.CatalogFilters)
+	   		if err = d.Set("catalog_filters", []map[string]interface{}{catalogFiltersMap}); err != nil {
+	   			return fmt.Errorf("Error setting catalog_filters: %s", err)
+	   		}
+	   	} */
 	if err = d.Set("url", catalog.URL); err != nil {
 		return fmt.Errorf("Error setting url: %s", err)
 	}
@@ -770,66 +774,6 @@ func resourceIBMCmCatalogSyndicationAuthorizationToMap(syndicationAuthorization 
 	syndicationAuthorizationMap["last_run"] = syndicationAuthorization.LastRun.String()
 
 	return syndicationAuthorizationMap
-}
-
-func resourceIBMCmCatalogUpdate(d *schema.ResourceData, meta interface{}) error {
-	catalogManagementClient, err := meta.(ClientSession).CatalogManagementV1()
-	if err != nil {
-		return err
-	}
-
-	replaceCatalogOptions := &catalogmanagementv1.ReplaceCatalogOptions{}
-
-	replaceCatalogOptions.SetCatalogIdentifier(d.Id())
-	if _, ok := d.GetOk("rev"); ok {
-		replaceCatalogOptions.SetRev(d.Get("rev").(string))
-	}
-	if _, ok := d.GetOk("label"); ok {
-		replaceCatalogOptions.SetLabel(d.Get("label").(string))
-	}
-	if _, ok := d.GetOk("short_description"); ok {
-		replaceCatalogOptions.SetShortDescription(d.Get("short_description").(string))
-	}
-	if _, ok := d.GetOk("catalog_icon_url"); ok {
-		replaceCatalogOptions.SetCatalogIconURL(d.Get("catalog_icon_url").(string))
-	}
-	if _, ok := d.GetOk("tags"); ok {
-		replaceCatalogOptions.SetTags(d.Get("tags").([]string))
-	}
-	if _, ok := d.GetOk("features"); ok {
-		var features []catalogmanagementv1.Feature
-		for _, e := range d.Get("features").([]interface{}) {
-			value := e.(map[string]interface{})
-			featuresItem := resourceIBMCmCatalogMapToFeature(value)
-			features = append(features, featuresItem)
-		}
-		replaceCatalogOptions.SetFeatures(features)
-	}
-	if _, ok := d.GetOk("disabled"); ok {
-		replaceCatalogOptions.SetDisabled(d.Get("disabled").(bool))
-	}
-	if _, ok := d.GetOk("resource_group_id"); ok {
-		replaceCatalogOptions.SetResourceGroupID(d.Get("resource_group_id").(string))
-	}
-	if _, ok := d.GetOk("owning_account"); ok {
-		replaceCatalogOptions.SetOwningAccount(d.Get("owning_account").(string))
-	}
-	if _, ok := d.GetOk("catalog_filters"); ok {
-		catalogFilters := resourceIBMCmCatalogMapToFilters(d.Get("catalog_filters.0").(map[string]interface{}))
-		replaceCatalogOptions.SetCatalogFilters(&catalogFilters)
-	}
-	if _, ok := d.GetOk("syndication_settings"); ok {
-		syndicationSettings := resourceIBMCmCatalogMapToSyndicationResource(d.Get("syndication_settings.0").(map[string]interface{}))
-		replaceCatalogOptions.SetSyndicationSettings(&syndicationSettings)
-	}
-
-	_, response, err := catalogManagementClient.ReplaceCatalog(replaceCatalogOptions)
-	if err != nil {
-		log.Printf("[DEBUG] ReplaceCatalog failed %s\n%s", err, response)
-		return err
-	}
-
-	return resourceIBMCmCatalogRead(d, meta)
 }
 
 func resourceIBMCmCatalogDelete(d *schema.ResourceData, meta interface{}) error {
