@@ -93,7 +93,7 @@ func resourceIBMCmOffering() *schema.Resource {
 				Description: "List of tags associated with this catalog.",
 				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
-			"rating": &schema.Schema{
+			/* "rating": &schema.Schema{
 				Type:        schema.TypeList,
 				Computed:    true,
 				Description: "Repository info for offerings.",
@@ -121,7 +121,7 @@ func resourceIBMCmOffering() *schema.Resource {
 						},
 					},
 				},
-			},
+			}, */
 			"created": &schema.Schema{
 				Type:        schema.TypeString,
 				Computed:    true,
@@ -144,7 +144,7 @@ func resourceIBMCmOffering() *schema.Resource {
 				ForceNew:    true,
 				Description: "Long description in the requested language.",
 			},
-			"features": &schema.Schema{
+			/* 			"features": &schema.Schema{
 				Type:        schema.TypeList,
 				Computed:    true,
 				Description: "list of features associated with this offering.",
@@ -162,8 +162,8 @@ func resourceIBMCmOffering() *schema.Resource {
 						},
 					},
 				},
-			},
-			"kinds": &schema.Schema{
+			}, */
+			/* "kinds": &schema.Schema{
 				Type:        schema.TypeList,
 				Computed:    true,
 				Description: "Array of kind.",
@@ -769,7 +769,7 @@ func resourceIBMCmOffering() *schema.Resource {
 						},
 					},
 				},
-			},
+			}, */
 			"permit_request_ibm_public_publish": &schema.Schema{
 				Type:        schema.TypeBool,
 				Computed:    true,
@@ -816,12 +816,12 @@ func resourceIBMCmOffering() *schema.Resource {
 				Computed:    true,
 				Description: "The name of the catalog.",
 			},
-			"metadata": &schema.Schema{
+			/* 			"metadata": &schema.Schema{
 				Type:        schema.TypeMap,
 				Computed:    true,
 				Description: "Map of metadata values for this offering.",
 				Elem:        &schema.Schema{Type: schema.TypeString},
-			},
+			}, */
 			"disclaimer": &schema.Schema{
 				Type:        schema.TypeString,
 				Computed:    true,
