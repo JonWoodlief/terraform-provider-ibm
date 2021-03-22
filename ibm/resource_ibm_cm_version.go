@@ -476,10 +476,8 @@ func resourceIBMCmVersionCreate(d *schema.ResourceData, meta interface{}) error 
 		return err
 	}
 
-	importOfferingVersionOptions := &catalogmanagementv1.ImportOfferingVersionOptions{}
+	importOfferingVersionOptions := catalogManagementClient.NewImportOfferingVersionOptions(d.Get("catalog_identifier").(string), d.Get("offering_id").(string))
 
-	importOfferingVersionOptions.SetCatalogIdentifier(d.Get("catalog_identifier").(string))
-	importOfferingVersionOptions.SetOfferingID(d.Get("offering_id").(string))
 	if _, ok := d.GetOk("tags"); ok {
 		importOfferingVersionOptions.SetTags(d.Get("tags").([]string))
 	}
