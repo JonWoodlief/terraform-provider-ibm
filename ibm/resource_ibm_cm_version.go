@@ -484,7 +484,10 @@ func resourceIBMCmVersionCreate(d *schema.ResourceData, meta interface{}) error 
 		importOfferingVersionOptions.SetTags(d.Get("tags").([]string))
 	}
 	if _, ok := d.GetOk("target_kinds"); ok {
-		importOfferingVersionOptions.SetTargetKinds(d.Get("target_kinds").([]string))
+		// importOfferingVersionOptions.SetTargetKinds(d.Get("target_kinds").([]string))
+		list := expandStringList(d.Get("target_kinds").([]interface{}))
+		importOfferingVersionOptions.SetTargetKinds(list)
+
 	}
 	if _, ok := d.GetOk("content"); ok {
 
