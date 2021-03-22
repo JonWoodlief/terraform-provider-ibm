@@ -960,44 +960,44 @@ func resourceIBMCmOfferingRead(d *schema.ResourceData, meta interface{}) error {
 	if err = d.Set("offering_support_url", offering.OfferingSupportURL); err != nil {
 		return fmt.Errorf("Error setting offering_support_url: %s", err)
 	}
-	if offering.Rating != nil {
-		ratingMap := resourceIBMCmOfferingRatingToMap(*offering.Rating)
-		if err = d.Set("rating", []map[string]interface{}{ratingMap}); err != nil {
-			return fmt.Errorf("Error setting rating: %s", err)
-		}
-	}
-	if err = d.Set("created", offering.Created.String()); err != nil {
-		return fmt.Errorf("Error setting created: %s", err)
-	}
-	if err = d.Set("updated", offering.Updated.String()); err != nil {
-		return fmt.Errorf("Error setting updated: %s", err)
-	}
+	/* 	if offering.Rating != nil {
+	   		ratingMap := resourceIBMCmOfferingRatingToMap(*offering.Rating)
+	   		if err = d.Set("rating", []map[string]interface{}{ratingMap}); err != nil {
+	   			return fmt.Errorf("Error setting rating: %s", err)
+	   		}
+	   	}
+	   	if err = d.Set("created", offering.Created.String()); err != nil {
+	   		return fmt.Errorf("Error setting created: %s", err)
+	   	}
+	   	if err = d.Set("updated", offering.Updated.String()); err != nil {
+	   		return fmt.Errorf("Error setting updated: %s", err)
+	   	} */
 	if err = d.Set("short_description", offering.ShortDescription); err != nil {
 		return fmt.Errorf("Error setting short_description: %s", err)
 	}
 	if err = d.Set("long_description", offering.LongDescription); err != nil {
 		return fmt.Errorf("Error setting long_description: %s", err)
 	}
-	if offering.Features != nil {
-		features := []map[string]interface{}{}
-		for _, featuresItem := range offering.Features {
-			featuresItemMap := resourceIBMCmOfferingFeatureToMap(featuresItem)
-			features = append(features, featuresItemMap)
-		}
-		if err = d.Set("features", features); err != nil {
-			return fmt.Errorf("Error setting features: %s", err)
-		}
-	}
-	if offering.Kinds != nil {
-		kinds := []map[string]interface{}{}
-		for _, kindsItem := range offering.Kinds {
-			kindsItemMap := resourceIBMCmOfferingKindToMap(kindsItem)
-			kinds = append(kinds, kindsItemMap)
-		}
-		if err = d.Set("kinds", kinds); err != nil {
-			return fmt.Errorf("Error setting kinds: %s", err)
-		}
-	}
+	/* 	if offering.Features != nil {
+	   		features := []map[string]interface{}{}
+	   		for _, featuresItem := range offering.Features {
+	   			featuresItemMap := resourceIBMCmOfferingFeatureToMap(featuresItem)
+	   			features = append(features, featuresItemMap)
+	   		}
+	   		if err = d.Set("features", features); err != nil {
+	   			return fmt.Errorf("Error setting features: %s", err)
+	   		}
+	   	}
+	   	if offering.Kinds != nil {
+	   		kinds := []map[string]interface{}{}
+	   		for _, kindsItem := range offering.Kinds {
+	   			kindsItemMap := resourceIBMCmOfferingKindToMap(kindsItem)
+	   			kinds = append(kinds, kindsItemMap)
+	   		}
+	   		if err = d.Set("kinds", kinds); err != nil {
+	   			return fmt.Errorf("Error setting kinds: %s", err)
+	   		}
+	   	} */
 	if err = d.Set("permit_request_ibm_public_publish", offering.PermitRequestIBMPublicPublish); err != nil {
 		return fmt.Errorf("Error setting permit_request_ibm_public_publish: %s", err)
 	}
@@ -1025,9 +1025,9 @@ func resourceIBMCmOfferingRead(d *schema.ResourceData, meta interface{}) error {
 	if err = d.Set("catalog_name", offering.CatalogName); err != nil {
 		return fmt.Errorf("Error setting catalog_name: %s", err)
 	}
-	if offering.Metadata != nil {
+	/* 	if offering.Metadata != nil {
 		// TODO: handle Metadata of type TypeMap -- not primitive type, not list
-	}
+	} */
 	if err = d.Set("disclaimer", offering.Disclaimer); err != nil {
 		return fmt.Errorf("Error setting disclaimer: %s", err)
 	}
