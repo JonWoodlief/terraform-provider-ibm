@@ -39,6 +39,11 @@ func resourceIBMCmOffering() *schema.Resource {
 				ForceNew:    true,
 				Description: "Catalog identifier.",
 			},
+			"offering_id": &schema.Schema{
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The id of the catalog containing this offering.",
+			},
 			"rev": &schema.Schema{
 				Type:        schema.TypeString,
 				Computed:    true,
@@ -928,7 +933,7 @@ func resourceIBMCmOfferingRead(d *schema.ResourceData, meta interface{}) error {
 			d.SetId("")
 			return nil
 		}
-		log.Printf("[DEBUG] GetOfferingWithContext failed %s\n%s", err, response)
+		log.Printf("[DEBUG] GetOffering failed %s\n%s", err, response)
 		return err
 	}
 	if err = d.Set("offering_id", offering.ID); err != nil {
