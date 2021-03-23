@@ -488,7 +488,7 @@ func resourceIBMCmVersionCreate(d *schema.ResourceData, meta interface{}) error 
 
 	}
 	if _, ok := d.GetOk("content"); ok {
-
+		importOfferingVersionOptions.SetContent([]byte(d.Get("content").(string)))
 	}
 	if _, ok := d.GetOk("zipurl"); ok {
 		importOfferingVersionOptions.SetZipurl(d.Get("zipurl").(string))
