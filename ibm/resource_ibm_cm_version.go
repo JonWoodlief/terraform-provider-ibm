@@ -144,56 +144,6 @@ func resourceIBMCmVersion() *schema.Resource {
 				Computed:    true,
 				Description: "File used to on-board this version.",
 			},
-			"configuration": &schema.Schema{
-				Type:        schema.TypeList,
-				Computed:    true,
-				Description: "List of user solicited overrides.",
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"key": &schema.Schema{
-							Type:        schema.TypeString,
-							Optional:    true,
-							Description: "Configuration key.",
-						},
-						"type": &schema.Schema{
-							Type:        schema.TypeString,
-							Optional:    true,
-							Description: "Value type (string, boolean, int).",
-						},
-						"default_value": &schema.Schema{
-							Type:        schema.TypeMap,
-							Optional:    true,
-							Description: "The default value.  To use a secret when the type is password, specify a JSON encoded value of $ref:#/components/schemas/SecretInstance, prefixed with `cmsm_v1:`.",
-						},
-						"value_constraint": &schema.Schema{
-							Type:        schema.TypeString,
-							Optional:    true,
-							Description: "Constraint associated with value, e.g., for string type - regx:[a-z].",
-						},
-						"description": &schema.Schema{
-							Type:        schema.TypeString,
-							Optional:    true,
-							Description: "Key description.",
-						},
-						"required": &schema.Schema{
-							Type:        schema.TypeBool,
-							Optional:    true,
-							Description: "Is key required to install.",
-						},
-						"options": &schema.Schema{
-							Type:        schema.TypeList,
-							Optional:    true,
-							Description: "List of options of type.",
-							Elem:        &schema.Schema{Type: schema.TypeMap},
-						},
-						"hidden": &schema.Schema{
-							Type:        schema.TypeBool,
-							Optional:    true,
-							Description: "Hide values.",
-						},
-					},
-				},
-			},
 			"metadata": &schema.Schema{
 				Type:        schema.TypeMap,
 				Computed:    true,
@@ -568,16 +518,6 @@ func resourceIBMCmVersionRead(d *schema.ResourceData, meta interface{}) error {
 	}
 	if err = d.Set("tgz_url", version.TgzURL); err != nil {
 		return fmt.Errorf("Error setting tgz_url: %s", err)
-	}
-	if version.Configuration != nil {
-		configuration := []map[string]interface{}{}
-		for _, configurationItem := range version.Configuration {
-			configurationItemMap := resourceIBMCmVersionConfigurationToMap(configurationItem)
-			configuration = append(configuration, configurationItemMap)
-		}
-		if err = d.Set("configuration", configuration); err != nil {
-			return fmt.Errorf("Error setting configuration: %s", err)
-		}
 	}
 	if version.Metadata != nil {
 		// TODO: handle Metadata of type TypeMap -- not primitive type, not list
