@@ -624,13 +624,7 @@ func resourceIBMCmVersionDelete(d *schema.ResourceData, meta interface{}) error 
 	}
 
 	deleteVersionOptions := &catalogmanagementv1.DeleteVersionOptions{}
-
-	parts, err := idParts(d.Id())
-	if err != nil {
-		return err
-	}
-
-	deleteVersionOptions.SetVersionLocID(parts[2])
+	deleteVersionOptions.SetVersionLocID(d.Id())
 
 	response, err := catalogManagementClient.DeleteVersion(deleteVersionOptions)
 	if err != nil {
