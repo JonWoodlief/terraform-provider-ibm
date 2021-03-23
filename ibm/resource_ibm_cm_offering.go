@@ -936,7 +936,7 @@ func resourceIBMCmOfferingRead(d *schema.ResourceData, meta interface{}) error {
 		log.Printf("[DEBUG] GetOffering failed %s\n%s", err, response)
 		return err
 	}
-	if err = d.Set("offering_id", parts[1]; err != nil {
+	if err = d.Set("offering_id", parts[1]); err != nil {
 		return fmt.Errorf("Error setting offering_id: %s", err)
 	}
 	if err = d.Set("url", offering.URL); err != nil {
