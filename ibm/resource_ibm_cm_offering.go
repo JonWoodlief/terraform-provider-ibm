@@ -875,8 +875,10 @@ func resourceIBMCmOfferingCreate(d *schema.ResourceData, meta interface{}) error
 	if _, ok := d.GetOk("offering_support_url"); ok {
 		createOfferingOptions.SetOfferingSupportURL(d.Get("offering_support_url").(string))
 	}
-	if _, ok := d.GetOk("tags"); ok {
-		createOfferingOptions.SetTags(d.Get("tags").([]string))
+	if tags, ok := d.GetOk("tags"); ok {
+		list := expandStringList(tags.([]interface{}))
+		createOfferingOptions.SetTags(list)
+
 	}
 	if _, ok := d.GetOk("short_description"); ok {
 		createOfferingOptions.SetShortDescription(d.Get("short_description").(string))
