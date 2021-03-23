@@ -338,13 +338,8 @@ func resourceIBMCmOfferingDelete(d *schema.ResourceData, meta interface{}) error
 
 	deleteOfferingOptions := &catalogmanagementv1.DeleteOfferingOptions{}
 
-	parts, err := idParts(d.Id())
-	if err != nil {
-		return err
-	}
-
-	deleteOfferingOptions.SetCatalogIdentifier(parts[0])
-	deleteOfferingOptions.SetOfferingID(parts[1])
+	deleteOfferingOptions.SetCatalogIdentifier(d.Get("catalog_id").(string))
+	deleteOfferingOptions.SetOfferingID(d.Id())
 
 	response, err := catalogManagementClient.DeleteOffering(deleteOfferingOptions)
 	if err != nil {
