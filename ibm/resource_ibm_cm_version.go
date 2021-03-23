@@ -510,9 +510,9 @@ func resourceIBMCmVersionCreate(d *schema.ResourceData, meta interface{}) error 
 		return err
 	}
 
-	version := offering.Kinds[0].Versions[0]
+	versionLocator := *offering.Kinds[0].Versions[0].VersionLocator
 
-	d.SetId(fmt.Sprintf("%s/%s/%s", *importOfferingVersionOptions.CatalogIdentifier, *importOfferingVersionOptions.OfferingID, *version.ID))
+	d.SetId(versionLocator)
 
 	return resourceIBMCmVersionRead(d, meta)
 }
@@ -525,12 +525,7 @@ func resourceIBMCmVersionRead(d *schema.ResourceData, meta interface{}) error {
 
 	getVersionOptions := &catalogmanagementv1.GetVersionOptions{}
 
-	parts, err := idParts(d.Id())
-	if err != nil {
-		return err
-	}
-
-	getVersionOptions.SetVersionLocID(parts[2])
+	getVersionOptions.SetVersionLocID(d.Id())
 
 	offering, response, err := catalogManagementClient.GetVersion(getVersionOptions)
 	version := offering.Kinds[0].Versions[0]
