@@ -68,6 +68,7 @@ func resourceIBMCmOffering() *schema.Resource {
 			"name": &schema.Schema{
 				Type:        schema.TypeString,
 				Computed:    true,
+				Optional:    true,
 				Description: "The programmatic name of this offering.",
 			},
 			"offering_icon_url": &schema.Schema{
@@ -134,7 +135,7 @@ func resourceIBMCmOffering() *schema.Resource {
 			"short_description": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
-				ForceNew:    true,
+				Computed:    true,
 				Description: "Short description in the requested language.",
 			},
 			"long_description": &schema.Schema{
