@@ -223,7 +223,7 @@ func resourceIBMCmOfferingCreate(d *schema.ResourceData, meta interface{}) error
 		return err
 	}
 
-	d.SetId(fmt.Sprintf("%s/%s", *createOfferingOptions.CatalogIdentifier, *offering.ID))
+	d.SetId(*offering.ID)
 
 	return resourceIBMCmOfferingRead(d, meta)
 }
@@ -236,13 +236,8 @@ func resourceIBMCmOfferingRead(d *schema.ResourceData, meta interface{}) error {
 
 	getOfferingOptions := &catalogmanagementv1.GetOfferingOptions{}
 
-	parts, err := idParts(d.Id())
-	if err != nil {
-		return err
-	}
-
-	getOfferingOptions.SetCatalogIdentifier(parts[0])
-	getOfferingOptions.SetOfferingID(parts[1])
+	getOfferingOptions.SetCatalogIdentifier(d.Get("catalog_id").(string))
+	getOfferingOptions.SetOfferingID(d.Id())
 
 	offering, response, err := catalogManagementClient.GetOffering(getOfferingOptions)
 	if err != nil {
@@ -253,7 +248,7 @@ func resourceIBMCmOfferingRead(d *schema.ResourceData, meta interface{}) error {
 		log.Printf("[DEBUG] GetOffering failed %s\n%s", err, response)
 		return err
 	}
-	if err = d.Set("offering_id", parts[1]); err != nil {
+	if err = d.Set("offering_id", d.Id()); err != nil {
 		return fmt.Errorf("Error setting offering_id: %s", err)
 	}
 	if err = d.Set("url", offering.URL); err != nil {
