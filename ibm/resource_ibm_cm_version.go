@@ -77,12 +77,6 @@ func resourceIBMCmVersion() *schema.Resource {
 				ForceNew:    true,
 				Description: "The semver value for this new version, if not found in the zip url package content.",
 			},
-			"include_config": &schema.Schema{
-				Type:        schema.TypeBool,
-				Optional:    true,
-				ForceNew:    true,
-				Description: "Add all possible configuration values to this version when importing.",
-			},
 			"repo_type": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
@@ -277,75 +271,6 @@ func resourceIBMCmVersion() *schema.Resource {
 					},
 				},
 			},
-			"entitlement": &schema.Schema{
-				Type:        schema.TypeList,
-				Computed:    true,
-				Description: "Entitlement license info.",
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"provider_name": &schema.Schema{
-							Type:        schema.TypeString,
-							Optional:    true,
-							Description: "Provider name.",
-						},
-						"provider_id": &schema.Schema{
-							Type:        schema.TypeString,
-							Optional:    true,
-							Description: "Provider ID.",
-						},
-						"product_id": &schema.Schema{
-							Type:        schema.TypeString,
-							Optional:    true,
-							Description: "Product ID.",
-						},
-						"part_numbers": &schema.Schema{
-							Type:        schema.TypeList,
-							Optional:    true,
-							Description: "list of license entitlement part numbers, eg. D1YGZLL,D1ZXILL.",
-							Elem:        &schema.Schema{Type: schema.TypeString},
-						},
-						"image_repo_name": &schema.Schema{
-							Type:        schema.TypeString,
-							Optional:    true,
-							Description: "Image repository name.",
-						},
-					},
-				},
-			},
-			"licenses": &schema.Schema{
-				Type:        schema.TypeList,
-				Computed:    true,
-				Description: "List of licenses the product was built with.",
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"id": &schema.Schema{
-							Type:        schema.TypeString,
-							Optional:    true,
-							Description: "License ID.",
-						},
-						"name": &schema.Schema{
-							Type:        schema.TypeString,
-							Optional:    true,
-							Description: "license name.",
-						},
-						"type": &schema.Schema{
-							Type:        schema.TypeString,
-							Optional:    true,
-							Description: "type of license e.g., Apache xxx.",
-						},
-						"url": &schema.Schema{
-							Type:        schema.TypeString,
-							Optional:    true,
-							Description: "URL for the license text.",
-						},
-						"description": &schema.Schema{
-							Type:        schema.TypeString,
-							Optional:    true,
-							Description: "License description.",
-						},
-					},
-				},
-			},
 			"image_manifest_url": &schema.Schema{
 				Type:        schema.TypeString,
 				Computed:    true,
@@ -361,40 +286,6 @@ func resourceIBMCmVersion() *schema.Resource {
 				Computed:    true,
 				Description: "Version of the package used to create this version.",
 			},
-			"state": &schema.Schema{
-				Type:        schema.TypeList,
-				Computed:    true,
-				Description: "Offering state.",
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"current": &schema.Schema{
-							Type:        schema.TypeString,
-							Optional:    true,
-							Description: "one of: new, validated, account-published, ibm-published, public-published.",
-						},
-						"current_entered": &schema.Schema{
-							Type:        schema.TypeString,
-							Optional:    true,
-							Description: "Date and time of current request.",
-						},
-						"pending": &schema.Schema{
-							Type:        schema.TypeString,
-							Optional:    true,
-							Description: "one of: new, validated, account-published, ibm-published, public-published.",
-						},
-						"pending_requested": &schema.Schema{
-							Type:        schema.TypeString,
-							Optional:    true,
-							Description: "Date and time of pending request.",
-						},
-						"previous": &schema.Schema{
-							Type:        schema.TypeString,
-							Optional:    true,
-							Description: "one of: new, validated, account-published, ibm-published, public-published.",
-						},
-					},
-				},
-			},
 			"version_locator": &schema.Schema{
 				Type:        schema.TypeString,
 				Computed:    true,
@@ -409,12 +300,6 @@ func resourceIBMCmVersion() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "Long description for version.",
-			},
-			"whitelisted_accounts": &schema.Schema{
-				Type:        schema.TypeList,
-				Computed:    true,
-				Description: "Whitelisted accounts for version.",
-				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
 		},
 	}
@@ -432,7 +317,6 @@ func resourceIBMCmVersionCreate(d *schema.ResourceData, meta interface{}) error 
 		importOfferingVersionOptions.SetTags(d.Get("tags").([]string))
 	}
 	if _, ok := d.GetOk("target_kinds"); ok {
-		// importOfferingVersionOptions.SetTargetKinds(d.Get("target_kinds").([]string))
 		list := expandStringList(d.Get("target_kinds").([]interface{}))
 		importOfferingVersionOptions.SetTargetKinds(list)
 
@@ -445,12 +329,6 @@ func resourceIBMCmVersionCreate(d *schema.ResourceData, meta interface{}) error 
 	}
 	if _, ok := d.GetOk("target_version"); ok {
 		importOfferingVersionOptions.SetTargetVersion(d.Get("target_version").(string))
-	}
-	if _, ok := d.GetOk("include_config"); ok {
-		importOfferingVersionOptions.SetIncludeConfig(d.Get("include_config").(bool))
-	}
-	if _, ok := d.GetOk("repo_type"); ok {
-		importOfferingVersionOptions.SetRepoType(d.Get("repo_type").(string))
 	}
 
 	offering, response, err := catalogManagementClient.ImportOfferingVersion(importOfferingVersionOptions)
@@ -521,100 +399,6 @@ func resourceIBMCmVersionRead(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	return nil
-}
-
-func resourceIBMCmVersionConfigurationToMap(configuration catalogmanagementv1.Configuration) map[string]interface{} {
-	configurationMap := map[string]interface{}{}
-
-	configurationMap["key"] = configuration.Key
-	configurationMap["type"] = configuration.Type
-	configurationMap["default_value"] = configuration.DefaultValue
-	configurationMap["value_constraint"] = configuration.ValueConstraint
-	configurationMap["description"] = configuration.Description
-	configurationMap["required"] = configuration.Required
-	/* 	if configuration.Options != nil {
-		options := []map[string]interface{}{}
-		for _, optionsItem := range configuration.Options {
-			options = append(options, optionsItem)
-		}
-		configurationMap["options"] = options
-	} */
-	configurationMap["hidden"] = configuration.Hidden
-
-	return configurationMap
-}
-
-func resourceIBMCmVersionValidationToMap(validation catalogmanagementv1.Validation) map[string]interface{} {
-	validationMap := map[string]interface{}{}
-
-	validationMap["validated"] = validation.Validated.String()
-	validationMap["requested"] = validation.Requested.String()
-	validationMap["state"] = validation.State
-	validationMap["last_operation"] = validation.LastOperation
-	if validation.Target != nil {
-		// TODO: handle Target of type TypeMap -- container, not list
-	}
-
-	return validationMap
-}
-
-func resourceIBMCmVersionResourceToMap(resource catalogmanagementv1.Resource) map[string]interface{} {
-	resourceMap := map[string]interface{}{}
-
-	resourceMap["type"] = resource.Type
-	resourceMap["value"] = resource.Value
-
-	return resourceMap
-}
-
-func resourceIBMCmVersionScriptToMap(script catalogmanagementv1.Script) map[string]interface{} {
-	scriptMap := map[string]interface{}{}
-
-	scriptMap["instructions"] = script.Instructions
-	scriptMap["script"] = script.Script
-	scriptMap["script_permission"] = script.ScriptPermission
-	scriptMap["delete_script"] = script.DeleteScript
-	scriptMap["scope"] = script.Scope
-
-	return scriptMap
-}
-
-func resourceIBMCmVersionVersionEntitlementToMap(versionEntitlement catalogmanagementv1.VersionEntitlement) map[string]interface{} {
-	versionEntitlementMap := map[string]interface{}{}
-
-	versionEntitlementMap["provider_name"] = versionEntitlement.ProviderName
-	versionEntitlementMap["provider_id"] = versionEntitlement.ProviderID
-	versionEntitlementMap["product_id"] = versionEntitlement.ProductID
-	if versionEntitlement.PartNumbers != nil {
-		versionEntitlementMap["part_numbers"] = versionEntitlement.PartNumbers
-	}
-	versionEntitlementMap["image_repo_name"] = versionEntitlement.ImageRepoName
-
-	return versionEntitlementMap
-}
-
-func resourceIBMCmVersionLicenseToMap(license catalogmanagementv1.License) map[string]interface{} {
-	licenseMap := map[string]interface{}{}
-
-	licenseMap["id"] = license.ID
-	licenseMap["name"] = license.Name
-	licenseMap["type"] = license.Type
-	licenseMap["url"] = license.URL
-	licenseMap["description"] = license.Description
-
-	return licenseMap
-}
-
-func resourceIBMCmVersionStateToMap(state catalogmanagementv1.State) map[string]interface{} {
-	stateMap := map[string]interface{}{}
-
-	stateMap["current"] = state.Current
-	stateMap["current_entered"] = state.CurrentEntered.String()
-	stateMap["pending"] = state.Pending
-	stateMap["pending_requested"] = state.PendingRequested.String()
-	stateMap["previous"] = state.Previous
-
-	return stateMap
 }
 
 func resourceIBMCmVersionDelete(d *schema.ResourceData, meta interface{}) error {

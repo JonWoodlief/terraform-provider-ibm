@@ -22,7 +22,6 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 
-	"github.com/IBM/go-sdk-core/v5/core"
 	"github.com/IBM/platform-services-go-sdk/catalogmanagementv1"
 )
 
@@ -366,15 +365,6 @@ func resourceIBMCmCatalogCreate(d *schema.ResourceData, meta interface{}) error 
 	if _, ok := d.GetOk("tags"); ok {
 		createCatalogOptions.SetTags(d.Get("tags").([]string))
 	}
-	if _, ok := d.GetOk("features"); ok {
-		var features []catalogmanagementv1.Feature
-		for _, e := range d.Get("features").([]interface{}) {
-			value := e.(map[string]interface{})
-			featuresItem := resourceIBMCmCatalogMapToFeature(value)
-			features = append(features, featuresItem)
-		}
-		createCatalogOptions.SetFeatures(features)
-	}
 	if _, ok := d.GetOk("disabled"); ok {
 		createCatalogOptions.SetDisabled(d.Get("disabled").(bool))
 	}
@@ -383,14 +373,6 @@ func resourceIBMCmCatalogCreate(d *schema.ResourceData, meta interface{}) error 
 	}
 	if _, ok := d.GetOk("owning_account"); ok {
 		createCatalogOptions.SetOwningAccount(d.Get("owning_account").(string))
-	}
-	if _, ok := d.GetOk("catalog_filters"); ok {
-		catalogFilters := resourceIBMCmCatalogMapToFilters(d.Get("catalog_filters.0").(map[string]interface{}))
-		createCatalogOptions.SetCatalogFilters(&catalogFilters)
-	}
-	if _, ok := d.GetOk("syndication_settings"); ok {
-		syndicationSettings := resourceIBMCmCatalogMapToSyndicationResource(d.Get("syndication_settings.0").(map[string]interface{}))
-		createCatalogOptions.SetSyndicationSettings(&syndicationSettings)
 	}
 
 	catalog, response, err := catalogManagementClient.CreateCatalog(createCatalogOptions)
@@ -402,169 +384,6 @@ func resourceIBMCmCatalogCreate(d *schema.ResourceData, meta interface{}) error 
 	d.SetId(*catalog.ID)
 
 	return resourceIBMCmCatalogRead(d, meta)
-}
-
-func resourceIBMCmCatalogMapToFeature(featureMap map[string]interface{}) catalogmanagementv1.Feature {
-	feature := catalogmanagementv1.Feature{}
-
-	if featureMap["title"] != nil {
-		feature.Title = core.StringPtr(featureMap["title"].(string))
-	}
-	if featureMap["description"] != nil {
-		feature.Description = core.StringPtr(featureMap["description"].(string))
-	}
-
-	return feature
-}
-
-func resourceIBMCmCatalogMapToFilters(filtersMap map[string]interface{}) catalogmanagementv1.Filters {
-	filters := catalogmanagementv1.Filters{}
-
-	if filtersMap["include_all"] != nil {
-		filters.IncludeAll = core.BoolPtr(filtersMap["include_all"].(bool))
-	}
-	if filtersMap["category_filters"] != nil {
-		// TODO: handle CategoryFilters of type CategoryFilter -- not primitive type, not list
-	}
-	if filtersMap["id_filters"] != nil {
-		// TODO: handle IDFilters of type IDFilter -- not primitive type, not list
-	}
-
-	return filters
-}
-
-func resourceIBMCmCatalogMapToCategoryFilter(categoryFilterMap map[string]interface{}) catalogmanagementv1.CategoryFilter {
-	categoryFilter := catalogmanagementv1.CategoryFilter{}
-
-	if categoryFilterMap["include"] != nil {
-		categoryFilter.Include = core.BoolPtr(categoryFilterMap["include"].(bool))
-	}
-	if categoryFilterMap["filter"] != nil {
-		// TODO: handle Filter of type FilterTerms -- not primitive type, not list
-	}
-
-	return categoryFilter
-}
-
-/* func resourceIBMCmCatalogMapToFilterTerms(filterTermsMap map[string]interface{}) catalogmanagementv1.FilterTerms {
-	filterTerms := catalogmanagementv1.FilterTerms{}
-
-	if filterTermsMap["filter_terms"] != nil {
-		filterTerms := []string{}
-		for _, filterTermsItem := range filterTermsMap["filter_terms"].([]interface{}) {
-			filterTerms = append(filterTerms, filterTermsItem.(string))
-		}
-		filterTerms.FilterTerms = filterTerms
-	}
-
-	return filterTerms
-} */
-
-func resourceIBMCmCatalogMapToIDFilter(idFilterMap map[string]interface{}) catalogmanagementv1.IDFilter {
-	idFilter := catalogmanagementv1.IDFilter{}
-
-	if idFilterMap["include"] != nil {
-		// TODO: handle Include of type FilterTerms -- not primitive type, not list
-	}
-	if idFilterMap["exclude"] != nil {
-		// TODO: handle Exclude of type FilterTerms -- not primitive type, not list
-	}
-
-	return idFilter
-}
-
-func resourceIBMCmCatalogMapToSyndicationResource(syndicationResourceMap map[string]interface{}) catalogmanagementv1.SyndicationResource {
-	syndicationResource := catalogmanagementv1.SyndicationResource{}
-
-	if syndicationResourceMap["remove_related_components"] != nil {
-		syndicationResource.RemoveRelatedComponents = core.BoolPtr(syndicationResourceMap["remove_related_components"].(bool))
-	}
-	if syndicationResourceMap["clusters"] != nil {
-		clusters := []catalogmanagementv1.SyndicationCluster{}
-		for _, clustersItem := range syndicationResourceMap["clusters"].([]interface{}) {
-			clustersItemModel := resourceIBMCmCatalogMapToSyndicationCluster(clustersItem.(map[string]interface{}))
-			clusters = append(clusters, clustersItemModel)
-		}
-		syndicationResource.Clusters = clusters
-	}
-	if syndicationResourceMap["history"] != nil {
-		// TODO: handle History of type SyndicationHistory -- not primitive type, not list
-	}
-	if syndicationResourceMap["authorization"] != nil {
-		// TODO: handle Authorization of type SyndicationAuthorization -- not primitive type, not list
-	}
-
-	return syndicationResource
-}
-
-func resourceIBMCmCatalogMapToSyndicationCluster(syndicationClusterMap map[string]interface{}) catalogmanagementv1.SyndicationCluster {
-	syndicationCluster := catalogmanagementv1.SyndicationCluster{}
-
-	if syndicationClusterMap["region"] != nil {
-		syndicationCluster.Region = core.StringPtr(syndicationClusterMap["region"].(string))
-	}
-	if syndicationClusterMap["id"] != nil {
-		syndicationCluster.ID = core.StringPtr(syndicationClusterMap["id"].(string))
-	}
-	if syndicationClusterMap["name"] != nil {
-		syndicationCluster.Name = core.StringPtr(syndicationClusterMap["name"].(string))
-	}
-	if syndicationClusterMap["resource_group_name"] != nil {
-		syndicationCluster.ResourceGroupName = core.StringPtr(syndicationClusterMap["resource_group_name"].(string))
-	}
-	if syndicationClusterMap["type"] != nil {
-		syndicationCluster.Type = core.StringPtr(syndicationClusterMap["type"].(string))
-	}
-	if syndicationClusterMap["namespaces"] != nil {
-		namespaces := []string{}
-		for _, namespacesItem := range syndicationClusterMap["namespaces"].([]interface{}) {
-			namespaces = append(namespaces, namespacesItem.(string))
-		}
-		syndicationCluster.Namespaces = namespaces
-	}
-	if syndicationClusterMap["all_namespaces"] != nil {
-		syndicationCluster.AllNamespaces = core.BoolPtr(syndicationClusterMap["all_namespaces"].(bool))
-	}
-
-	return syndicationCluster
-}
-
-func resourceIBMCmCatalogMapToSyndicationHistory(syndicationHistoryMap map[string]interface{}) catalogmanagementv1.SyndicationHistory {
-	syndicationHistory := catalogmanagementv1.SyndicationHistory{}
-
-	if syndicationHistoryMap["namespaces"] != nil {
-		namespaces := []string{}
-		for _, namespacesItem := range syndicationHistoryMap["namespaces"].([]interface{}) {
-			namespaces = append(namespaces, namespacesItem.(string))
-		}
-		syndicationHistory.Namespaces = namespaces
-	}
-	if syndicationHistoryMap["clusters"] != nil {
-		clusters := []catalogmanagementv1.SyndicationCluster{}
-		for _, clustersItem := range syndicationHistoryMap["clusters"].([]interface{}) {
-			clustersItemModel := resourceIBMCmCatalogMapToSyndicationCluster(clustersItem.(map[string]interface{}))
-			clusters = append(clusters, clustersItemModel)
-		}
-		syndicationHistory.Clusters = clusters
-	}
-	if syndicationHistoryMap["last_run"] != nil {
-
-	}
-
-	return syndicationHistory
-}
-
-func resourceIBMCmCatalogMapToSyndicationAuthorization(syndicationAuthorizationMap map[string]interface{}) catalogmanagementv1.SyndicationAuthorization {
-	syndicationAuthorization := catalogmanagementv1.SyndicationAuthorization{}
-
-	if syndicationAuthorizationMap["token"] != nil {
-		syndicationAuthorization.Token = core.StringPtr(syndicationAuthorizationMap["token"].(string))
-	}
-	if syndicationAuthorizationMap["last_run"] != nil {
-
-	}
-
-	return syndicationAuthorization
 }
 
 func resourceIBMCmCatalogRead(d *schema.ResourceData, meta interface{}) error {
@@ -601,31 +420,9 @@ func resourceIBMCmCatalogRead(d *schema.ResourceData, meta interface{}) error {
 			return fmt.Errorf("Error setting tags: %s", err)
 		}
 	}
-	if catalog.Features != nil {
-		features := []map[string]interface{}{}
-		for _, featuresItem := range catalog.Features {
-			featuresItemMap := resourceIBMCmCatalogFeatureToMap(featuresItem)
-			features = append(features, featuresItemMap)
-		}
-		if err = d.Set("features", features); err != nil {
-			return fmt.Errorf("Error setting features: %s", err)
-		}
-	}
 	if err = d.Set("disabled", catalog.Disabled); err != nil {
 		return fmt.Errorf("Error setting disabled: %s", err)
 	}
-	/* 	if err = d.Set("resource_group_id", catalog.ResourceGroupID); err != nil {
-	   		return fmt.Errorf("Error setting resource_group_id: %s", err)
-	   	}
-	   	if err = d.Set("owning_account", catalog.OwningAccount); err != nil {
-	   		return fmt.Errorf("Error setting owning_account: %s", err)
-	   	}
-	   	if catalog.CatalogFilters != nil {
-	   		catalogFiltersMap := resourceIBMCmCatalogFiltersToMap(*catalog.CatalogFilters)
-	   		if err = d.Set("catalog_filters", []map[string]interface{}{catalogFiltersMap}); err != nil {
-	   			return fmt.Errorf("Error setting catalog_filters: %s", err)
-	   		}
-	   	} */
 	if err = d.Set("url", catalog.URL); err != nil {
 		return fmt.Errorf("Error setting url: %s", err)
 	}
@@ -643,137 +440,6 @@ func resourceIBMCmCatalogRead(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	return nil
-}
-
-func resourceIBMCmCatalogFeatureToMap(feature catalogmanagementv1.Feature) map[string]interface{} {
-	featureMap := map[string]interface{}{}
-
-	featureMap["title"] = feature.Title
-	featureMap["description"] = feature.Description
-
-	return featureMap
-}
-
-func resourceIBMCmCatalogFiltersToMap(filters catalogmanagementv1.Filters) map[string]interface{} {
-	filtersMap := map[string]interface{}{}
-
-	filtersMap["include_all"] = filters.IncludeAll
-	if filters.CategoryFilters != nil {
-		// TODO: handle CategoryFilters of type TypeMap -- container, not list
-	}
-	if filters.IDFilters != nil {
-		IDFiltersMap := resourceIBMCmCatalogIDFilterToMap(*filters.IDFilters)
-		filtersMap["id_filters"] = []map[string]interface{}{IDFiltersMap}
-	}
-
-	return filtersMap
-}
-
-func resourceIBMCmCatalogCategoryFilterToMap(categoryFilter catalogmanagementv1.CategoryFilter) map[string]interface{} {
-	categoryFilterMap := map[string]interface{}{}
-
-	categoryFilterMap["include"] = categoryFilter.Include
-	if categoryFilter.Filter != nil {
-		FilterMap := resourceIBMCmCatalogFilterTermsToMap(*categoryFilter.Filter)
-		categoryFilterMap["filter"] = []map[string]interface{}{FilterMap}
-	}
-
-	return categoryFilterMap
-}
-
-func resourceIBMCmCatalogFilterTermsToMap(filterTerms catalogmanagementv1.FilterTerms) map[string]interface{} {
-	filterTermsMap := map[string]interface{}{}
-
-	if filterTerms.FilterTerms != nil {
-		filterTermsMap["filter_terms"] = filterTerms.FilterTerms
-	}
-
-	return filterTermsMap
-}
-
-func resourceIBMCmCatalogIDFilterToMap(idFilter catalogmanagementv1.IDFilter) map[string]interface{} {
-	idFilterMap := map[string]interface{}{}
-
-	if idFilter.Include != nil {
-		IncludeMap := resourceIBMCmCatalogFilterTermsToMap(*idFilter.Include)
-		idFilterMap["include"] = []map[string]interface{}{IncludeMap}
-	}
-	if idFilter.Exclude != nil {
-		ExcludeMap := resourceIBMCmCatalogFilterTermsToMap(*idFilter.Exclude)
-		idFilterMap["exclude"] = []map[string]interface{}{ExcludeMap}
-	}
-
-	return idFilterMap
-}
-
-func resourceIBMCmCatalogSyndicationResourceToMap(syndicationResource catalogmanagementv1.SyndicationResource) map[string]interface{} {
-	syndicationResourceMap := map[string]interface{}{}
-
-	syndicationResourceMap["remove_related_components"] = syndicationResource.RemoveRelatedComponents
-	if syndicationResource.Clusters != nil {
-		clusters := []map[string]interface{}{}
-		for _, clustersItem := range syndicationResource.Clusters {
-			clustersItemMap := resourceIBMCmCatalogSyndicationClusterToMap(clustersItem)
-			clusters = append(clusters, clustersItemMap)
-			// TODO: handle Clusters of type TypeList -- list of non-primitive, not model items
-		}
-		syndicationResourceMap["clusters"] = clusters
-	}
-	if syndicationResource.History != nil {
-		HistoryMap := resourceIBMCmCatalogSyndicationHistoryToMap(*syndicationResource.History)
-		syndicationResourceMap["history"] = []map[string]interface{}{HistoryMap}
-	}
-	if syndicationResource.Authorization != nil {
-		AuthorizationMap := resourceIBMCmCatalogSyndicationAuthorizationToMap(*syndicationResource.Authorization)
-		syndicationResourceMap["authorization"] = []map[string]interface{}{AuthorizationMap}
-	}
-
-	return syndicationResourceMap
-}
-
-func resourceIBMCmCatalogSyndicationClusterToMap(syndicationCluster catalogmanagementv1.SyndicationCluster) map[string]interface{} {
-	syndicationClusterMap := map[string]interface{}{}
-
-	syndicationClusterMap["region"] = syndicationCluster.Region
-	syndicationClusterMap["id"] = syndicationCluster.ID
-	syndicationClusterMap["name"] = syndicationCluster.Name
-	syndicationClusterMap["resource_group_name"] = syndicationCluster.ResourceGroupName
-	syndicationClusterMap["type"] = syndicationCluster.Type
-	if syndicationCluster.Namespaces != nil {
-		syndicationClusterMap["namespaces"] = syndicationCluster.Namespaces
-	}
-	syndicationClusterMap["all_namespaces"] = syndicationCluster.AllNamespaces
-
-	return syndicationClusterMap
-}
-
-func resourceIBMCmCatalogSyndicationHistoryToMap(syndicationHistory catalogmanagementv1.SyndicationHistory) map[string]interface{} {
-	syndicationHistoryMap := map[string]interface{}{}
-
-	if syndicationHistory.Namespaces != nil {
-		syndicationHistoryMap["namespaces"] = syndicationHistory.Namespaces
-	}
-	if syndicationHistory.Clusters != nil {
-		clusters := []map[string]interface{}{}
-		for _, clustersItem := range syndicationHistory.Clusters {
-			clustersItemMap := resourceIBMCmCatalogSyndicationClusterToMap(clustersItem)
-			clusters = append(clusters, clustersItemMap)
-			// TODO: handle Clusters of type TypeList -- list of non-primitive, not model items
-		}
-		syndicationHistoryMap["clusters"] = clusters
-	}
-	syndicationHistoryMap["last_run"] = syndicationHistory.LastRun.String()
-
-	return syndicationHistoryMap
-}
-
-func resourceIBMCmCatalogSyndicationAuthorizationToMap(syndicationAuthorization catalogmanagementv1.SyndicationAuthorization) map[string]interface{} {
-	syndicationAuthorizationMap := map[string]interface{}{}
-
-	syndicationAuthorizationMap["token"] = syndicationAuthorization.Token
-	syndicationAuthorizationMap["last_run"] = syndicationAuthorization.LastRun.String()
-
-	return syndicationAuthorizationMap
 }
 
 func resourceIBMCmCatalogDelete(d *schema.ResourceData, meta interface{}) error {
