@@ -100,16 +100,6 @@ func dataSourceIBMCmVersion() *schema.Resource {
 				Computed:    true,
 				Description: "hash of the content.",
 			},
-			"created": &schema.Schema{
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "The date and time this version was created.",
-			},
-			"updated": &schema.Schema{
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "The date and time this version was last updated.",
-			},
 			"catalog_id": &schema.Schema{
 				Type:        schema.TypeString,
 				Computed:    true,

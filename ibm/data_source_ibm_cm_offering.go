@@ -92,16 +92,6 @@ func dataSourceIBMCmOffering() *schema.Resource {
 				Description: "List of tags associated with this catalog.",
 				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
-			"created": &schema.Schema{
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "The date and time this catalog was created.",
-			},
-			"updated": &schema.Schema{
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "The date and time this catalog was last updated.",
-			},
 			"short_description": &schema.Schema{
 				Type:        schema.TypeString,
 				Computed:    true,
