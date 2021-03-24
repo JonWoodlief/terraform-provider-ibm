@@ -40,9 +40,9 @@ func TestAccIBMCm(t *testing.T) {
 				Config: testAccCheckIBMCmConfig(clusterId, clusterRegion),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					testAccCheckIBMCmCatalogExists("ibm_cm_catalog.cm_catalog"),
-					testAccCheckIBMCmOfferingExists("ibm_cm_offering"),
-					testAccCheckIBMCmVersionExists("ibm_cm_version"),
-					testAccCheckIBMCmVersionExists("ibm_cm_offering_instance"),
+					testAccCheckIBMCmOfferingExists("ibm_cm_offering.cm_offering"),
+					testAccCheckIBMCmVersionExists("ibm_cm_version.cm_version"),
+					testAccCheckIBMCmOfferingInstanceExists("ibm_cm_offering_instance.cm_offering_instance_instance"),
 				),
 			},
 			resource.TestStep{
@@ -72,7 +72,7 @@ func testAccCheckIBMCmConfig(clusterId string, clusterRegion string) string {
 
 		resource "ibm_cm_offering" "cm_offering" {
 			catalog_id = ibm_cm_catalog.cm_catalog.id
-			label = "tf_test_offering
+			label = "tf_test_offering"
 			tags = ["dev_ops", "target_roks", "operator"]
 		}
 
@@ -86,29 +86,12 @@ func testAccCheckIBMCmConfig(clusterId string, clusterRegion string) string {
 			catalog_id = ibm_cm_catalog.cm_catalog.id
 			offering_id = ibm_cm_offering.cm_offering.id
 			kind_format = "operator"
-			version = ibm_cm_version.cm_version.version.kind_id
-			cluster_id = %s
-			cluster_region = %s
+			version = ibm_cm_version.cm_version.version
+			cluster_id = "%s"
+			cluster_region = "%s"
 			cluster_namespaces = ["tf-cm-test"]
 			cluster_all_namespaces = false
 		}
-		  
-		data "ibm_cm_catalog" "cm_catalog_data" {
-			catalog_identifier = ibm_cm_catalog.cm_catalog.id
-		}
-		  
-		data "ibm_cm_offering" "cm_offering_data" {
-			catalog_identifier = ibm_cm_catalog.cm_catalog.id
-			offering_id = ibm_cm_offering.cm_offering.id
-		}
-		  
-		data "ibm_cm_version" "cm_version_data" {
-			version_loc_id = ibm_cm_version.cm_version.id
-		}
-		  
-		data "ibm_cm_offering_instance" "cm_offering_instance_data" {
-			instance_identifier = ibm_cm_offering_instance.cm_offering_instance_instance.id
-		}		    
 		`, clusterId, clusterRegion)
 }
 
@@ -157,7 +140,7 @@ func testAccCheckIBMCmCatalogDestroy(s *terraform.State) error {
 
 		if err == nil {
 			return fmt.Errorf("cm_catalog still exists: %s", rs.Primary.ID)
-		} else if response.StatusCode != 404 {
+		} else if response.StatusCode != 403 {
 			return fmt.Errorf("Error checking for cm_catalog (%s) has been destroyed: %s", rs.Primary.ID, err)
 		}
 	}
