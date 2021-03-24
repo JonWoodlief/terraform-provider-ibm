@@ -270,8 +270,8 @@ func dataSourceIBMCmOfferingRead(context context.Context, d *schema.ResourceData
 	}
 
 	if offering.RepoInfo != nil {
-		err = d.Set("repo_info", dataSourceOfferingRepoInfoToMap(*offering.RepoInfo))
-		if err != nil {
+		repoInfoMap := dataSourceOfferingRepoInfoToMap(*offering.RepoInfo)
+		if err = d.Set("repo_info", []map[string]interface{}{repoInfoMap}); err != nil {
 			return diag.FromErr(fmt.Errorf("Error setting repo_info %s", err))
 		}
 	}
