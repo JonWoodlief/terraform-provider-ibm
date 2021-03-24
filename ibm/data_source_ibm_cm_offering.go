@@ -35,13 +35,14 @@ func dataSourceIBMCmOffering() *schema.Resource {
 			"catalog_identifier": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
-				ForceNew:    true,
 				Description: "Catalog identifier.",
+				ForceNew:    true,
 			},
 			"offering_id": &schema.Schema{
 				Type:        schema.TypeString,
-				Computed:    true,
+				Required:    true,
 				Description: "The id of the catalog containing this offering.",
+				ForceNew:    true,
 			},
 			"rev": &schema.Schema{
 				Type:        schema.TypeString,
@@ -60,7 +61,7 @@ func dataSourceIBMCmOffering() *schema.Resource {
 			},
 			"label": &schema.Schema{
 				Type:        schema.TypeString,
-				Required:    true,
+				Computed:    true,
 				Description: "Display Name in the requested language.",
 				ForceNew:    true,
 			},
@@ -86,7 +87,7 @@ func dataSourceIBMCmOffering() *schema.Resource {
 			},
 			"tags": &schema.Schema{
 				Type:        schema.TypeList,
-				Optional:    true,
+				Computed:    true,
 				ForceNew:    true,
 				Description: "List of tags associated with this catalog.",
 				Elem:        &schema.Schema{Type: schema.TypeString},
@@ -148,8 +149,7 @@ func dataSourceIBMCmOffering() *schema.Resource {
 			},
 			"catalog_id": &schema.Schema{
 				Type:        schema.TypeString,
-				Required:    true,
-				ForceNew:    true,
+				Computed:    true,
 				Description: "The id of the catalog containing this offering.",
 			},
 			"catalog_name": &schema.Schema{
@@ -207,10 +207,7 @@ func dataSourceIBMCmOfferingRead(context context.Context, d *schema.ResourceData
 		return diag.FromErr(err)
 	}
 
-	d.SetId(fmt.Sprintf("%s/%s", *offering.CatalogID, *offering.ID))
-	if err = d.Set("offering_id", d.Id()); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting id: %s", err))
-	}
+	d.SetId(*offering.ID)
 	if err = d.Set("url", offering.URL); err != nil {
 		return diag.FromErr(fmt.Errorf("Error setting url: %s", err))
 	}

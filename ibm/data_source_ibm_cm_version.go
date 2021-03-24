@@ -32,54 +32,52 @@ func dataSourceIBMCmVersion() *schema.Resource {
 		ReadContext: dataSourceIBMCmVersionRead,
 
 		Schema: map[string]*schema.Schema{
-			"catalog_identifier": &schema.Schema{
+			"version_loc_id": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
 				Description: "Catalog identifier.",
 			},
+			"catalog_identifier": &schema.Schema{
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "Catalog identifier.",
+			},
 			"offering_id": &schema.Schema{
 				Type:        schema.TypeString,
-				Required:    true,
-				ForceNew:    true,
+				Computed:    true,
 				Description: "Offering identification.",
 			},
 			"tags": &schema.Schema{
 				Type:        schema.TypeList,
-				Optional:    true,
-				ForceNew:    true,
+				Computed:    true,
 				Description: "Tags array.",
 				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
 			"target_kinds": &schema.Schema{
 				Type:        schema.TypeList,
-				Optional:    true,
-				ForceNew:    true,
+				Computed:    true,
 				Description: "Target kinds.  Current valid values are 'iks', 'roks', 'vcenter', and 'terraform'.",
 				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
 			"content": &schema.Schema{
 				Type:        schema.TypeString,
-				Optional:    true,
-				ForceNew:    true,
+				Computed:    true,
 				Description: "byte array representing the content to be imported.  Only supported for OVA images at this time.",
 			},
 			"zipurl": &schema.Schema{
 				Type:        schema.TypeString,
-				Optional:    true,
-				ForceNew:    true,
+				Computed:    true,
 				Description: "URL path to zip location.  If not specified, must provide content in the body of this call.",
 			},
 			"target_version": &schema.Schema{
 				Type:        schema.TypeString,
-				Optional:    true,
-				ForceNew:    true,
+				Computed:    true,
 				Description: "The semver value for this new version, if not found in the zip url package content.",
 			},
 			"repo_type": &schema.Schema{
 				Type:        schema.TypeString,
-				Optional:    true,
-				ForceNew:    true,
+				Computed:    true,
 				Description: "The type of repository containing this version.  Valid values are 'public_git' or 'enterprise_git'.",
 			},
 			"rev": &schema.Schema{
@@ -184,7 +182,7 @@ func dataSourceIBMCmVersionRead(context context.Context, d *schema.ResourceData,
 
 	getVersionOptions := &catalogmanagementv1.GetVersionOptions{}
 
-	getVersionOptions.SetVersionLocID(d.Id())
+	getVersionOptions.SetVersionLocID(d.Get("version_loc_id").(string))
 
 	offering, response, err := catalogManagementClient.GetVersionWithContext(context, getVersionOptions)
 	version := offering.Kinds[0].Versions[0]

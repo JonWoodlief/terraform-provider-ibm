@@ -32,6 +32,11 @@ func dataSourceIBMCmOfferingInstance() *schema.Resource {
 		ReadContext: dataSourceIBMCmOfferingInstanceRead,
 
 		Schema: map[string]*schema.Schema{
+			"instance_identifier": &schema.Schema{
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "ID for this instance",
+			},
 			"url": &schema.Schema{
 				Type:        schema.TypeString,
 				Computed:    true,
@@ -102,7 +107,7 @@ func dataSourceIBMCmOfferingInstanceRead(context context.Context, d *schema.Reso
 
 	getOfferingInstanceOptions := &catalogmanagementv1.GetOfferingInstanceOptions{}
 
-	getOfferingInstanceOptions.SetInstanceIdentifier(d.Id())
+	getOfferingInstanceOptions.SetInstanceIdentifier(d.Get("instance_identifier").(string))
 
 	offeringInstance, response, err := catalogManagementClient.GetOfferingInstanceWithContext(context, getOfferingInstanceOptions)
 	if err != nil {
