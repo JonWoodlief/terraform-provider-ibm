@@ -33,12 +33,6 @@ func resourceIBMCmOffering() *schema.Resource {
 		Importer: &schema.ResourceImporter{},
 
 		Schema: map[string]*schema.Schema{
-			"catalog_identifier": &schema.Schema{
-				Type:        schema.TypeString,
-				Required:    true,
-				ForceNew:    true,
-				Description: "Catalog identifier.",
-			},
 			"offering_id": &schema.Schema{
 				Type:        schema.TypeString,
 				Computed:    true,
