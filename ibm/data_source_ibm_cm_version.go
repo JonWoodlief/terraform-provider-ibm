@@ -182,6 +182,7 @@ func dataSourceIBMCmVersionRead(context context.Context, d *schema.ResourceData,
 		return diag.FromErr(err)
 	}
 
+	d.SetId(*version.VersionLocator)
 	if err = d.Set("crn", version.CRN); err != nil {
 		return diag.FromErr(fmt.Errorf("Error setting crn: %s", err))
 	}

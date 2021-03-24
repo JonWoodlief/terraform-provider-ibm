@@ -29,7 +29,6 @@ The following arguments are supported:
 The following attributes are exported:
 
 * `id` - The unique identifier of the cm_offering_instance.
-* `id` - provisioned instance ID (part of the CRN).
 
 * `url` - url reference to this object.
 

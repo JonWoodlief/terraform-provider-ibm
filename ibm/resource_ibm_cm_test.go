@@ -42,7 +42,11 @@ func TestAccIBMCm(t *testing.T) {
 					testAccCheckIBMCmCatalogExists("ibm_cm_catalog.cm_catalog"),
 					testAccCheckIBMCmOfferingExists("ibm_cm_offering.cm_offering"),
 					testAccCheckIBMCmVersionExists("ibm_cm_version.cm_version"),
-					testAccCheckIBMCmOfferingInstanceExists("ibm_cm_offering_instance.cm_offering_instance_instance"),
+					testAccCheckIBMCmOfferingInstanceExists("ibm_cm_offering_instance.cm_offering_instance"),
+					resource.TestCheckResourceAttrSet("data.ibm_cm_catalog.cm_catalog_data", "label"),
+					resource.TestCheckResourceAttrSet("data.ibm_cm_offering.cm_offering_data", "label"),
+					resource.TestCheckResourceAttrSet("data.ibm_cm_version.cm_version_data", "repo_url"),
+					resource.TestCheckResourceAttrSet("data.ibm_cm_offering_instance.cm_offering_instance_data", "label"),
 				),
 			},
 			resource.TestStep{
@@ -81,8 +85,9 @@ func testAccCheckIBMCmConfig(clusterId string, clusterRegion string) string {
 			offering_id = ibm_cm_offering.cm_offering.id
 			zipurl = "https://raw.githubusercontent.com/operator-framework/community-operators/master/community-operators/cockroachdb/5.0.3/manifests/cockroachdb.clusterserviceversion.yaml"
 		}
-		resource "ibm_cm_offering_instance" "cm_offering_instance_instance" {
-			label = "tf_test_offering_label"
+
+		resource "ibm_cm_offering_instance" "cm_offering_instance" {
+			label = "tf_test_offering_instance_label"
 			catalog_id = ibm_cm_catalog.cm_catalog.id
 			offering_id = ibm_cm_offering.cm_offering.id
 			kind_format = "operator"
@@ -92,6 +97,24 @@ func testAccCheckIBMCmConfig(clusterId string, clusterRegion string) string {
 			cluster_namespaces = ["tf-cm-test"]
 			cluster_all_namespaces = false
 		}
+
+		data "ibm_cm_catalog" "cm_catalog_data" {
+			catalog_identifier = ibm_cm_catalog.cm_catalog.id
+		}
+
+		data "ibm_cm_offering" "cm_offering_data" {
+			catalog_identifier = ibm_cm_catalog.cm_catalog.id
+			offering_id = ibm_cm_offering.cm_offering.id
+		}
+
+		data "ibm_cm_version" "cm_version_data" {
+			version_loc_id = ibm_cm_version.cm_version.id
+		}
+
+		data "ibm_cm_offering_instance" "cm_offering_instance_data" {
+			instance_identifier = ibm_cm_offering_instance.cm_offering_instance.id
+		}
+		  
 		`, clusterId, clusterRegion)
 }
 

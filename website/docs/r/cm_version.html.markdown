@@ -16,6 +16,7 @@ Provides a resource for cm_version. This allows cm_version to be created, update
 resource "cm_version" "cm_version" {
   catalog_identifier = "catalog_identifier"
   offering_id = "offering_id"
+  zipurl = "placeholder"
 }
 ```
 
@@ -37,32 +38,12 @@ The following arguments are supported:
 
 The following attributes are exported:
 
-* `id` - The unique identifier of the cm_version.
-* `rev` - Cloudant revision.
+* `id` - The unique identifier and version locator of the version.
 * `crn` - Version's CRN.
 * `version` - Version of content type.
 * `sha` - hash of the content.
-* `created` - The date and time this version was created.
-* `updated` - The date and time this version was last updated.
 * `catalog_id` - Catalog ID.
 * `kind_id` - Kind ID.
 * `repo_url` - Content's repo URL.
 * `source_url` - Content's source URL (e.g git repo).
 * `tgz_url` - File used to on-board this version.
-* `configuration` - List of user solicited overrides.
-* `metadata` - Open ended metadata information.
-* `validation` - Validation response.
-* `required_resources` - Resource requirments for installation.
-* `single_instance` - Denotes if single instance can be deployed to a given cluster.
-* `install` - Script information.
-* `pre_install` - Optional pre-install instructions.
-* `entitlement` - Entitlement license info.
-* `licenses` - List of licenses the product was built with.
-* `image_manifest_url` - If set, denotes a url to a YAML file with list of container images used by this version.
-* `deprecated` - read only field, indicating if this version is deprecated.
-* `package_version` - Version of the package used to create this version.
-* `state` - Offering state.
-* `version_locator` - A dotted value of `catalogID`.`versionID`.
-* `console_url` - Console URL.
-* `long_description` - Long description for version.
-* `whitelisted_accounts` - Whitelisted accounts for version.

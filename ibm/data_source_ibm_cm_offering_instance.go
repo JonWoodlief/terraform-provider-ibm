@@ -115,6 +115,8 @@ func dataSourceIBMCmOfferingInstanceRead(context context.Context, d *schema.Reso
 		return diag.FromErr(err)
 	}
 
+	d.SetId(*offeringInstance.ID)
+
 	if err = d.Set("url", offeringInstance.URL); err != nil {
 		return diag.FromErr(fmt.Errorf("Error setting url: %s", err))
 	}
