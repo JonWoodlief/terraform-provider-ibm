@@ -191,12 +191,6 @@ func dataSourceIBMCmVersionRead(context context.Context, d *schema.ResourceData,
 	if err = d.Set("sha", version.Sha); err != nil {
 		return diag.FromErr(fmt.Errorf("Error setting sha: %s", err))
 	}
-	if err = d.Set("created", version.Created); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting created: %s", err))
-	}
-	if err = d.Set("updated", version.Updated); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting updated: %s", err))
-	}
 	if err = d.Set("catalog_id", version.CatalogID); err != nil {
 		return diag.FromErr(fmt.Errorf("Error setting catalog_id: %s", err))
 	}
