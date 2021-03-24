@@ -93,7 +93,6 @@ func resourceIBMCmOfferingInstanceCreate(d *schema.ResourceData, meta interface{
 	}
 
 	createOfferingInstanceOptions := &catalogmanagementv1.CreateOfferingInstanceOptions{}
-	log.Printf("[DEBUG] client is a nil pointer: %v\n", catalogManagementClient == nil)
 
 	createOfferingInstanceOptions.SetXAuthRefreshToken(rsConClient.Config.IAMRefreshToken)
 	if _, ok := d.GetOk("label"); ok {

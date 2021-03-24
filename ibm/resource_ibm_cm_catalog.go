@@ -346,13 +346,8 @@ func resourceIBMCmCatalogCreate(d *schema.ResourceData, meta interface{}) error 
 		return err
 	}
 
-	log.Printf("[DEBUG] client is a nil pointer: %v\n", catalogManagementClient == nil)
-
 	createCatalogOptions := &catalogmanagementv1.CreateCatalogOptions{}
 
-	if _, ok := d.GetOk("rev"); ok {
-		createCatalogOptions.SetRev(d.Get("rev").(string))
-	}
 	if _, ok := d.GetOk("label"); ok {
 		createCatalogOptions.SetLabel(d.Get("label").(string))
 	}

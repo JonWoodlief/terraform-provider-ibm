@@ -32,16 +32,6 @@ func dataSourceIBMCmOfferingInstance() *schema.Resource {
 		ReadContext: dataSourceIBMCmOfferingInstanceRead,
 
 		Schema: map[string]*schema.Schema{
-			"instance_identifier": &schema.Schema{
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "Version Instance identifier.",
-			},
-			"id": &schema.Schema{
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "provisioned instance ID (part of the CRN).",
-			},
 			"url": &schema.Schema{
 				Type:        schema.TypeString,
 				Computed:    true,
@@ -112,7 +102,7 @@ func dataSourceIBMCmOfferingInstanceRead(context context.Context, d *schema.Reso
 
 	getOfferingInstanceOptions := &catalogmanagementv1.GetOfferingInstanceOptions{}
 
-	getOfferingInstanceOptions.SetInstanceIdentifier(d.Get("instance_identifier").(string))
+	getOfferingInstanceOptions.SetInstanceIdentifier(d.Id())
 
 	offeringInstance, response, err := catalogManagementClient.GetOfferingInstanceWithContext(context, getOfferingInstanceOptions)
 	if err != nil {
@@ -120,10 +110,6 @@ func dataSourceIBMCmOfferingInstanceRead(context context.Context, d *schema.Reso
 		return diag.FromErr(err)
 	}
 
-	d.SetId(*offeringInstance.ID)
-	if err = d.Set("id", offeringInstance.ID); err != nil {
-		return diag.FromErr(fmt.Errorf("Error setting id: %s", err))
-	}
 	if err = d.Set("url", offeringInstance.URL); err != nil {
 		return diag.FromErr(fmt.Errorf("Error setting url: %s", err))
 	}
