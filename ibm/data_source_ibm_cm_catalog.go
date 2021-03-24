@@ -135,10 +135,10 @@ func dataSourceIBMCmCatalogRead(context context.Context, d *schema.ResourceData,
 	if err = d.Set("offerings_url", catalog.OfferingsURL); err != nil {
 		return diag.FromErr(fmt.Errorf("Error setting offerings_url: %s", err))
 	}
-	if err = d.Set("created", catalog.Created); err != nil {
+	if err = d.Set("created", catalog.Created.String()); err != nil {
 		return diag.FromErr(fmt.Errorf("Error setting created: %s", err))
 	}
-	if err = d.Set("updated", catalog.Updated); err != nil {
+	if err = d.Set("updated", catalog.Updated.String()); err != nil {
 		return diag.FromErr(fmt.Errorf("Error setting updated: %s", err))
 	}
 	return nil
