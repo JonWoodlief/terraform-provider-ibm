@@ -77,6 +77,15 @@ func resourceIBMCmOfferingInstance() *schema.Resource {
 				Required:    true,
 				Description: "designate to install into all namespaces.",
 			},
+			"key_value_pairs": &schema.Schema{
+				Type: schema.TypeList,
+				Elem: &schema.Schema{
+					Type: schema.TypeList,
+					Elem: &schema.Schema{
+						Type: schema.TypeString,
+					},
+				},
+			},
 		},
 	}
 }
