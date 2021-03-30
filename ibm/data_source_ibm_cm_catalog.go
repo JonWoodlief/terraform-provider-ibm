@@ -25,11 +25,6 @@ func dataSourceIBMCmCatalog() *schema.Resource {
 				ForceNew:    true,
 				Description: "ID for catalog",
 			},
-			"rev": &schema.Schema{
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "Cloudant revision.",
-			},
 			"label": &schema.Schema{
 				Type:        schema.TypeString,
 				Computed:    true,

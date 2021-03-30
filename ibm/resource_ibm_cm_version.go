@@ -64,17 +64,6 @@ func resourceIBMCmVersion() *schema.Resource {
 				ForceNew:    true,
 				Description: "The semver value for this new version, if not found in the zip url package content.",
 			},
-			"repo_type": &schema.Schema{
-				Type:        schema.TypeString,
-				Optional:    true,
-				ForceNew:    true,
-				Description: "The type of repository containing this version.  Valid values are 'public_git' or 'enterprise_git'.",
-			},
-			"rev": &schema.Schema{
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "Cloudant revision.",
-			},
 			"crn": &schema.Schema{
 				Type:        schema.TypeString,
 				Computed:    true,
@@ -124,41 +113,6 @@ func resourceIBMCmVersion() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "File used to on-board this version.",
-			},
-			"single_instance": &schema.Schema{
-				Type:        schema.TypeBool,
-				Computed:    true,
-				Description: "Denotes if single instance can be deployed to a given cluster.",
-			},
-			"image_manifest_url": &schema.Schema{
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "If set, denotes a url to a YAML file with list of container images used by this version.",
-			},
-			"deprecated": &schema.Schema{
-				Type:        schema.TypeBool,
-				Computed:    true,
-				Description: "read only field, indicating if this version is deprecated.",
-			},
-			"package_version": &schema.Schema{
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "Version of the package used to create this version.",
-			},
-			"version_locator": &schema.Schema{
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "A dotted value of `catalogID`.`versionID`.",
-			},
-			"console_url": &schema.Schema{
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "Console URL.",
-			},
-			"long_description": &schema.Schema{
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "Long description for version.",
 			},
 		},
 	}

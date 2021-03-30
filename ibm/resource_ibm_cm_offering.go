@@ -25,11 +25,6 @@ func resourceIBMCmOffering() *schema.Resource {
 				Computed:    true,
 				Description: "The id of the catalog containing this offering.",
 			},
-			"rev": &schema.Schema{
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "Cloudant revision.",
-			},
 			"url": &schema.Schema{
 				Type:        schema.TypeString,
 				Computed:    true,
@@ -72,16 +67,6 @@ func resourceIBMCmOffering() *schema.Resource {
 				ForceNew:    true,
 				Description: "List of tags associated with this catalog.",
 				Elem:        &schema.Schema{Type: schema.TypeString},
-			},
-			"created": &schema.Schema{
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "The date and time this catalog was created.",
-			},
-			"updated": &schema.Schema{
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "The date and time this catalog was last updated.",
 			},
 			"short_description": &schema.Schema{
 				Type:        schema.TypeString,
@@ -157,12 +142,12 @@ func resourceIBMCmOffering() *schema.Resource {
 					Schema: map[string]*schema.Schema{
 						"token": &schema.Schema{
 							Type:        schema.TypeString,
-							Optional:    true,
+							Computed:    true,
 							Description: "Token for private repos.",
 						},
 						"type": &schema.Schema{
 							Type:        schema.TypeString,
-							Optional:    true,
+							Computed:    true,
 							Description: "Public or enterprise GitHub.",
 						},
 					},

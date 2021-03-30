@@ -25,53 +25,6 @@ func dataSourceIBMCmVersion() *schema.Resource {
 				ForceNew:    true,
 				Description: "Catalog identifier.",
 			},
-			"catalog_identifier": &schema.Schema{
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "Catalog identifier.",
-			},
-			"offering_id": &schema.Schema{
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "Offering identification.",
-			},
-			"tags": &schema.Schema{
-				Type:        schema.TypeList,
-				Computed:    true,
-				Description: "Tags array.",
-				Elem:        &schema.Schema{Type: schema.TypeString},
-			},
-			"target_kinds": &schema.Schema{
-				Type:        schema.TypeList,
-				Computed:    true,
-				Description: "Target kinds.  Current valid values are 'iks', 'roks', 'vcenter', and 'terraform'.",
-				Elem:        &schema.Schema{Type: schema.TypeString},
-			},
-			"content": &schema.Schema{
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "byte array representing the content to be imported.  Only supported for OVA images at this time.",
-			},
-			"zipurl": &schema.Schema{
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "URL path to zip location.  If not specified, must provide content in the body of this call.",
-			},
-			"target_version": &schema.Schema{
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "The semver value for this new version, if not found in the zip url package content.",
-			},
-			"repo_type": &schema.Schema{
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "The type of repository containing this version.  Valid values are 'public_git' or 'enterprise_git'.",
-			},
-			"rev": &schema.Schema{
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "Cloudant revision.",
-			},
 			"crn": &schema.Schema{
 				Type:        schema.TypeString,
 				Computed:    true,
@@ -92,11 +45,6 @@ func dataSourceIBMCmVersion() *schema.Resource {
 				Computed:    true,
 				Description: "Catalog ID.",
 			},
-			"kind_id": &schema.Schema{
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "Kind ID.",
-			},
 			"repo_url": &schema.Schema{
 				Type:        schema.TypeString,
 				Computed:    true,
@@ -111,41 +59,6 @@ func dataSourceIBMCmVersion() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "File used to on-board this version.",
-			},
-			"single_instance": &schema.Schema{
-				Type:        schema.TypeBool,
-				Computed:    true,
-				Description: "Denotes if single instance can be deployed to a given cluster.",
-			},
-			"image_manifest_url": &schema.Schema{
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "If set, denotes a url to a YAML file with list of container images used by this version.",
-			},
-			"deprecated": &schema.Schema{
-				Type:        schema.TypeBool,
-				Computed:    true,
-				Description: "read only field, indicating if this version is deprecated.",
-			},
-			"package_version": &schema.Schema{
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "Version of the package used to create this version.",
-			},
-			"version_locator": &schema.Schema{
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "A dotted value of `catalogID`.`versionID`.",
-			},
-			"console_url": &schema.Schema{
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "Console URL.",
-			},
-			"long_description": &schema.Schema{
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "Long description for version.",
 			},
 		},
 	}

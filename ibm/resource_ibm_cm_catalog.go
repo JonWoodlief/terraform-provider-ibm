@@ -20,11 +20,6 @@ func resourceIBMCmCatalog() *schema.Resource {
 		Importer: &schema.ResourceImporter{},
 
 		Schema: map[string]*schema.Schema{
-			"rev": &schema.Schema{
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "Cloudant revision.",
-			},
 			"label": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
@@ -64,16 +59,6 @@ func resourceIBMCmCatalog() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "URL path to offerings.",
-			},
-			"created": &schema.Schema{
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "The date-time this catalog was created.",
-			},
-			"updated": &schema.Schema{
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "The date-time this catalog was last updated.",
 			},
 		},
 	}

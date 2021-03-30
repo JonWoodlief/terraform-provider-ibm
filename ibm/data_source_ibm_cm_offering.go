@@ -31,11 +31,6 @@ func dataSourceIBMCmOffering() *schema.Resource {
 				Description: "The id of the catalog containing this offering.",
 				ForceNew:    true,
 			},
-			"rev": &schema.Schema{
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "Cloudant revision.",
-			},
 			"url": &schema.Schema{
 				Type:        schema.TypeString,
 				Computed:    true,
@@ -71,12 +66,6 @@ func dataSourceIBMCmOffering() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "URL to be displayed in the Consumption UI for getting support on this offering.",
-			},
-			"tags": &schema.Schema{
-				Type:        schema.TypeList,
-				Computed:    true,
-				Description: "List of tags associated with this catalog.",
-				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
 			"short_description": &schema.Schema{
 				Type:        schema.TypeString,
