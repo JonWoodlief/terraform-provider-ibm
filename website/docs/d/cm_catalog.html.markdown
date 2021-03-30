@@ -1,7 +1,7 @@
 ---
 layout: "ibm"
 page_title: "IBM : cm_catalog"
-sidebar_current: "docs-ibm-datasource-cm-catalog"
+subcategory: "Catalog Management"
 description: |-
   Get information about cm_catalog
 ---

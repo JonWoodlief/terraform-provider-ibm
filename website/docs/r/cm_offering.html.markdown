@@ -1,7 +1,7 @@
 ---
 layout: "ibm"
 page_title: "IBM : cm_offering"
-sidebar_current: "docs-ibm-resource-cm-offering"
+subcategory: "Catalog Management"
 description: |-
   Manages cm_offering.
 ---

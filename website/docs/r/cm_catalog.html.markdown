@@ -1,7 +1,7 @@
 ---
 layout: "ibm"
 page_title: "IBM : cm_catalog"
-sidebar_current: "docs-ibm-resource-cm-catalog"
+subcategory: "Catalog Management"
 description: |-
   Manages cm_catalog.
 ---

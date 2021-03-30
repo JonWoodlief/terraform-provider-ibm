@@ -1,7 +1,7 @@
 ---
 layout: "ibm"
 page_title: "IBM : cm_version"
-sidebar_current: "docs-ibm-datasource-cm-version"
+subcategory: "Catalog Management"
 description: |-
   Get information about cm_version
 ---

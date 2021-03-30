@@ -1,18 +1,5 @@
-/**
- * (C) Copyright IBM Corp. 2021.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright IBM Corp. 2017, 2021 All Rights Reserved.
+// Licensed under the Mozilla Public License v2.0
 
 package ibm
 
@@ -88,7 +75,6 @@ func dataSourceIBMCmOffering() *schema.Resource {
 			"tags": &schema.Schema{
 				Type:        schema.TypeList,
 				Computed:    true,
-				ForceNew:    true,
 				Description: "List of tags associated with this catalog.",
 				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
@@ -165,12 +151,12 @@ func dataSourceIBMCmOffering() *schema.Resource {
 					Schema: map[string]*schema.Schema{
 						"token": &schema.Schema{
 							Type:        schema.TypeString,
-							Optional:    true,
+							Computed:    true,
 							Description: "Token for private repos.",
 						},
 						"type": &schema.Schema{
 							Type:        schema.TypeString,
-							Optional:    true,
+							Computed:    true,
 							Description: "Public or enterprise GitHub.",
 						},
 					},

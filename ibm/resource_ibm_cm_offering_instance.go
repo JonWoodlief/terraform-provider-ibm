@@ -68,7 +68,7 @@ func resourceIBMCmOfferingInstance() *schema.Resource {
 			},
 			"cluster_namespaces": &schema.Schema{
 				Type:        schema.TypeList,
-				Required:    true,
+				Computed:    true,
 				Description: "List of target namespaces to install into.",
 				Elem:        &schema.Schema{Type: schema.TypeString},
 			},

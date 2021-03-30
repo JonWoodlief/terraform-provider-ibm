@@ -1,7 +1,7 @@
 ---
 layout: "ibm"
 page_title: "IBM : cm_offering"
-sidebar_current: "docs-ibm-datasource-cm-offering"
+subcategory: "Catalog Management"
 description: |-
   Get information about cm_offering
 ---

@@ -20,4 +20,4 @@ Schematics
 Transit Gateway
 VPC infrastructure
 Secrets Manager
-
+Catalog Management

@@ -1,7 +1,7 @@
 ---
 layout: "ibm"
 page_title: "IBM : cm_version"
-sidebar_current: "docs-ibm-resource-cm-version"
+subcategory: "Catalog Management"
 description: |-
   Manages cm_version.
 ---
