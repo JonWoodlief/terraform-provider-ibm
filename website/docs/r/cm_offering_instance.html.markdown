@@ -39,6 +39,7 @@ The following arguments are supported:
 * `cluster_region` - (Required, string) Cluster region (e.g., us-south).
 * `cluster_namespaces` - (Required, List) List of target namespaces to install into.
 * `cluster_all_namespaces` - (Required, bool) designate to install into all namespaces.
+* `resource_group_id` - (Optional, string) id for a resource group to install the offering instance into
 
 ## Attribute Reference
 
@@ -46,4 +47,6 @@ In addition to all arguments above, the following attributes are exported:
 
 * `id` - The unique identifier of the cm_offering_instance.
 * `url` - Url reference to this object.
+* `_rev` - cloudant revision of this object
 * `crn` - Platform CRN for this instance.
+* `schematics_workspace_id` - id of the schematics workspace used to install this offering, if applicable

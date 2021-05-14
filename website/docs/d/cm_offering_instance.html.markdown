@@ -32,6 +32,8 @@ In addition to all arguments above, the following attributes are exported:
 
 * `url` - url reference to this object.
 
+* `_rev` - cloudant revisionn of this object
+
 * `crn` - platform CRN for this instance.
 
 * `label` - the label for this instance.
@@ -52,3 +54,6 @@ In addition to all arguments above, the following attributes are exported:
 
 * `cluster_all_namespaces` - designate to install into all namespaces.
 
+* `schematics_workspace_id` - Id of the schematics workspace, for offering instances installed through schematics
+
+* `resource_group_id` - Id of the resource group this instance was installed into
