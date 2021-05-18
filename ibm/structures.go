@@ -2146,6 +2146,37 @@ func flatterSatelliteZones(zones *schema.Set) []string {
 	return zoneList
 }
 
+// error object
+type ServiceErrorResponse struct {
+	Message    string
+	StatusCode int
+	Result     interface{}
+}
+
+func beautifyError(err error, response *core.DetailedResponse) *ServiceErrorResponse {
+	var (
+		statusCode int
+		result     interface{}
+	)
+	if response != nil {
+		statusCode = response.StatusCode
+		result = response.Result
+	}
+	return &ServiceErrorResponse{
+		Message:    err.Error(),
+		StatusCode: statusCode,
+		Result:     result,
+	}
+}
+
+func (response *ServiceErrorResponse) String() string {
+	output, err := json.MarshalIndent(response, "", "    ")
+	if err == nil {
+		return fmt.Sprintf("%+v\n", string(output))
+	}
+	return fmt.Sprintf("Error : %#v", response)
+}
+
 // IAM Policy Management
 func getResourceAttribute(name string, r iampolicymanagementv1.PolicyResource) *string {
 	for _, a := range r.Attributes {
@@ -2399,4 +2430,21 @@ func getIBMUniqueId(accountID, userEmail string, meta interface{}) (string, erro
 		}
 	}
 	return "", fmt.Errorf("User %s is not found under account %s", userEmail, accountID)
+}
+
+func immutableResourceCustomizeDiff(resourceList []string, diff *schema.ResourceDiff) error {
+
+	for _, rName := range resourceList {
+		if diff.Id() != "" && diff.HasChange(rName) {
+			o, n := diff.GetChange(rName)
+			old := o.(string)
+			new := n.(string)
+			if len(old) > 0 && old != new {
+				if !(rName == sateLocZone && strings.Contains(old, new)) {
+					return fmt.Errorf("'%s' attribute is immutable and can't be changed from %s to %s.", rName, old, new)
+				}
+			}
+		}
+	}
+	return nil
 }

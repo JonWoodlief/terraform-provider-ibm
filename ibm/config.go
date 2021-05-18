@@ -17,6 +17,7 @@ import (
 	// Added code for the Power Colo Offering
 
 	apigateway "github.com/IBM/apigateway-go-sdk"
+	"github.com/IBM/container-registry-go-sdk/containerregistryv1"
 	"github.com/IBM/go-sdk-core/v4/core"
 	cosconfig "github.com/IBM/ibm-cos-sdk-go-config/resourceconfigurationv1"
 	kp "github.com/IBM/keyprotect-go-client"
@@ -70,7 +71,6 @@ import (
 	"github.com/IBM-Cloud/bluemix-go/api/cis/cisv1"
 	"github.com/IBM-Cloud/bluemix-go/api/container/containerv1"
 	"github.com/IBM-Cloud/bluemix-go/api/container/containerv2"
-	registryv1 "github.com/IBM-Cloud/bluemix-go/api/container/registryv1"
 	"github.com/IBM-Cloud/bluemix-go/api/functions"
 	"github.com/IBM-Cloud/bluemix-go/api/globalsearch/globalsearchv2"
 	"github.com/IBM-Cloud/bluemix-go/api/globaltagging/globaltaggingv3"
@@ -188,7 +188,7 @@ type ClientSession interface {
 	BluemixUserDetails() (*UserConfig, error)
 	ContainerAPI() (containerv1.ContainerServiceAPI, error)
 	VpcContainerAPI() (containerv2.ContainerServiceAPI, error)
-	ContainerRegistryAPI() (registryv1.RegistryServiceAPI, error)
+	ContainerRegistryV1() (*containerregistryv1.ContainerRegistryV1, error)
 	CisAPI() (cisv1.CisServiceAPI, error)
 	FunctionClient() (*whisk.Client, error)
 	GlobalSearchAPI() (globalsearchv2.GlobalSearchServiceAPI, error)
@@ -275,8 +275,8 @@ type clientSession struct {
 	csv2ConfigErr  error
 	csv2ServiceAPI containerv2.ContainerServiceAPI
 
-	crv1ConfigErr  error
-	crv1ServiceAPI registryv1.RegistryServiceAPI
+	containerRegistryClientErr error
+	containerRegistryClient    *containerregistryv1.ContainerRegistryV1
 
 	stxConfigErr  error
 	stxServiceAPI schematics.SchematicsServiceAPI
@@ -531,9 +531,9 @@ func (sess clientSession) VpcContainerAPI() (containerv2.ContainerServiceAPI, er
 	return sess.csv2ServiceAPI, sess.csv2ConfigErr
 }
 
-// ContainerRegistryAPI provides v2Container Service APIs ...
-func (sess clientSession) ContainerRegistryAPI() (registryv1.RegistryServiceAPI, error) {
-	return sess.crv1ServiceAPI, sess.crv1ConfigErr
+// ContainerRegistryV1 provides Container Registry Service APIs ...
+func (session clientSession) ContainerRegistryV1() (*containerregistryv1.ContainerRegistryV1, error) {
+	return session.containerRegistryClient, session.containerRegistryClientErr
 }
 
 // SchematicsAPI provides schematics Service APIs ...
@@ -924,7 +924,7 @@ func (c *Config) ClientSession() (interface{}, error) {
 		session.accountV1ConfigErr = errEmptyBluemixCredentials
 		session.csConfigErr = errEmptyBluemixCredentials
 		session.csv2ConfigErr = errEmptyBluemixCredentials
-		session.crv1ConfigErr = errEmptyBluemixCredentials
+		session.containerRegistryClientErr = errEmptyBluemixCredentials
 		session.kpErr = errEmptyBluemixCredentials
 		session.pushServiceClientErr = errEmptyBluemixCredentials
 		session.kmsErr = errEmptyBluemixCredentials
@@ -1081,12 +1081,6 @@ func (c *Config) ClientSession() (interface{}, error) {
 		session.csv2ConfigErr = fmt.Errorf("Error occured while configuring vpc Container Service for K8s cluster: %q", err)
 	}
 	session.csv2ServiceAPI = v2clusterAPI
-
-	v1registryAPI, err := registryv1.New(sess.BluemixSession)
-	if err != nil {
-		session.crv1ConfigErr = fmt.Errorf("Error occured while configuring Container Registry: %q", err)
-	}
-	session.crv1ServiceAPI = v1registryAPI
 
 	hpcsAPI, err := hpcs.New(sess.BluemixSession)
 	if err != nil {
@@ -1262,6 +1256,36 @@ func (c *Config) ClientSession() (interface{}, error) {
 		session.pushServiceClient = pnclient
 	} else {
 		session.pushServiceClientErr = fmt.Errorf("Error occured while configuring push notification service: %q", err)
+	}
+
+	// Construct an "options" struct for creating the service client.
+	containerRegistryClientURL, err := containerregistryv1.GetServiceURLForRegion(c.Region)
+	if err != nil {
+		containerRegistryClientURL = containerregistryv1.DefaultServiceURL
+	}
+	if c.Visibility == "private" || c.Visibility == "public-and-private" {
+		containerRegistryClientURL, err = GetPrivateServiceURLForRegion(c.Region)
+		if err != nil {
+			containerRegistryClientURL, _ = GetPrivateServiceURLForRegion("us-south")
+		}
+	}
+	containerRegistryClientOptions := &containerregistryv1.ContainerRegistryV1Options{
+		Authenticator: authenticator,
+		URL:           envFallBack([]string{"IBMCLOUD_CR_API_ENDPOINT"}, containerRegistryClientURL),
+		Account:       core.StringPtr(userConfig.userAccount),
+	}
+
+	// Construct the service client.
+	session.containerRegistryClient, err = containerregistryv1.NewContainerRegistryV1(containerRegistryClientOptions)
+	if err == nil {
+		// Enable retries for API calls
+		session.containerRegistryClient.Service.EnableRetries(c.RetryCount, c.RetryDelay)
+		// Add custom header for analytics
+		session.containerRegistryClient.SetDefaultHeaders(gohttp.Header{
+			"X-Original-User-Agent": {fmt.Sprintf("terraform-provider-ibm/%s", version.Version)},
+		})
+	} else {
+		session.containerRegistryClientErr = fmt.Errorf("Error occurred while configuring IBM Cloud Container Registry API service: %q", err)
 	}
 
 	//cosconfigurl := fmt.Sprintf("https://%s.iaas.cloud.ibm.com/v1", c.Region)
@@ -2107,7 +2131,7 @@ func newSession(c *Config) (*Session, error) {
 			IAMAccessToken:  c.IAMToken,
 			IAMRefreshToken: c.IAMRefreshToken,
 			//Comment out debug mode for v0.12
-			//Debug:           os.Getenv("TF_LOG") != "",
+			//Debug:         os.Getenv("TF_LOG") != "",
 			HTTPTimeout:   c.BluemixTimeout,
 			Region:        c.Region,
 			ResourceGroup: c.ResourceGroup,
@@ -2128,7 +2152,7 @@ func newSession(c *Config) (*Session, error) {
 		bmxConfig := &bluemix.Config{
 			BluemixAPIKey: c.BluemixAPIKey,
 			//Comment out debug mode for v0.12
-			// Debug:         os.Getenv("TF_LOG") != "",
+			//Debug:         os.Getenv("TF_LOG") != "",
 			HTTPTimeout:   c.BluemixTimeout,
 			Region:        c.Region,
 			ResourceGroup: c.ResourceGroup,

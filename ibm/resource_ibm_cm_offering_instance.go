@@ -231,6 +231,14 @@ func resourceIBMCmOfferingInstanceUpdate(d *schema.ResourceData, meta interface{
 		return err
 	}
 
+	getOfferingInstanceOptions := &catalogmanagementv1.GetOfferingInstanceOptions{}
+
+	getOfferingInstanceOptions.SetInstanceIdentifier(d.Id())
+
+	offeringInstance, response, err := catalogManagementClient.GetOfferingInstance(getOfferingInstanceOptions)
+
+	rev := offeringInstance.Rev
+
 	rsConClient, err := meta.(ClientSession).BluemixSession()
 	if err != nil {
 		return err
@@ -241,9 +249,7 @@ func resourceIBMCmOfferingInstanceUpdate(d *schema.ResourceData, meta interface{
 	putOfferingInstanceOptions.SetInstanceIdentifier(d.Id())
 	putOfferingInstanceOptions.SetID(d.Id())
 	putOfferingInstanceOptions.SetXAuthRefreshToken(rsConClient.Config.IAMRefreshToken)
-	if _, ok := d.GetOk("_rev"); ok {
-		putOfferingInstanceOptions.SetRev(d.Get("_rev").(string))
-	}
+	putOfferingInstanceOptions.SetRev(*offeringInstance.Rev)
 	if _, ok := d.GetOk("label"); ok {
 		putOfferingInstanceOptions.SetLabel(d.Get("label").(string))
 	}
