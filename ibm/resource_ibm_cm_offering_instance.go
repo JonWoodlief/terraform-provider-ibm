@@ -236,8 +236,10 @@ func resourceIBMCmOfferingInstanceUpdate(d *schema.ResourceData, meta interface{
 	getOfferingInstanceOptions.SetInstanceIdentifier(d.Id())
 
 	offeringInstance, response, err := catalogManagementClient.GetOfferingInstance(getOfferingInstanceOptions)
-
-	rev := offeringInstance.Rev
+	if err != nil {
+		log.Printf("[DEBUG] Failed to retrieve rev %s\n%s", err, response)
+		return err
+	}
 
 	rsConClient, err := meta.(ClientSession).BluemixSession()
 	if err != nil {
@@ -282,7 +284,7 @@ func resourceIBMCmOfferingInstanceUpdate(d *schema.ResourceData, meta interface{
 		putOfferingInstanceOptions.SetResourceGroupID(d.Get("resource_group_id").(string))
 	}
 
-	_, response, err := catalogManagementClient.PutOfferingInstance(putOfferingInstanceOptions)
+	_, response, err = catalogManagementClient.PutOfferingInstance(putOfferingInstanceOptions)
 	if err != nil {
 		log.Printf("[DEBUG] PutOfferingInstance failed %s\n%s", err, response)
 		return err
