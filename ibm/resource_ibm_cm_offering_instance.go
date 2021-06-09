@@ -32,11 +32,6 @@ func resourceIBMCmOfferingInstance() *schema.Resource {
 				Computed:    true,
 				Description: "platform CRN for this instance.",
 			},
-			"_rev": &schema.Schema{
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "Cloudant Revision for this instance",
-			},
 			"label": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
@@ -93,6 +88,23 @@ func resourceIBMCmOfferingInstance() *schema.Resource {
 				Optional:    true,
 				Description: "id of the resource group",
 			},
+			"install_plan": &schema.Schema{
+				Type:        schema.TypeString,
+				Optional:    true,
+				Default:     "automatic",
+				Description: "install plan for the subscription of the operator- can be either automatic or manual. Required for operator bundles",
+			},
+			"channel": &schema.Schema{
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "channel to target for the operator subscription. Required for operator bundles",
+			},
+			/* 			"wait_until_successful": {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     true,
+				Description: "Whether to wait until the offering instance successfully provisions, or to return when accepted",
+			}, */
 		},
 	}
 }
@@ -146,6 +158,12 @@ func resourceIBMCmOfferingInstanceCreate(d *schema.ResourceData, meta interface{
 	if _, ok := d.GetOk("resource_group_id"); ok {
 		createOfferingInstanceOptions.SetResourceGroupID(d.Get("resource_group_id").(string))
 	}
+	if _, ok := d.GetOk("install_plan"); ok {
+		createOfferingInstanceOptions.SetInstallPlan(d.Get("install_plan").(string))
+	}
+	if _, ok := d.GetOk("channel"); ok {
+		createOfferingInstanceOptions.SetChannel(d.Get("channel").(string))
+	}
 
 	offeringInstance, response, err := catalogManagementClient.CreateOfferingInstance(createOfferingInstanceOptions)
 	if err != nil {
@@ -155,10 +173,26 @@ func resourceIBMCmOfferingInstanceCreate(d *schema.ResourceData, meta interface{
 
 	d.SetId(*offeringInstance.ID)
 
+	/* 	if wait_until_successful {
+		if err = waitUntilSuccess(d, meta); err != nil {
+			log.Printf("[DEBUG] CreateOfferingInstance failed %s\n%s", err, response)
+			return err
+		}
+	} */
+
 	log.Printf("LOG2 Service version instance of type %q was created on cluster %q", *createOfferingInstanceOptions.KindFormat, *createOfferingInstanceOptions.ClusterID)
 
 	return resourceIBMCmOfferingInstanceRead(d, meta)
 }
+
+/* func waitUntilSuccess(d *schema.ResourceData, meta interface{}) error {
+	getOfferingInstanceOptions := &catalogmanagementv1.GetOfferingInstanceOptions{}
+
+	getOfferingInstanceOptions.SetInstanceIdentifier(d.Id())
+
+	for offeringInstance, response, err := catalogManagementClient.GetOfferingInstance(getOfferingInstanceOptions); offeringInstance
+
+} */
 
 func resourceIBMCmOfferingInstanceRead(d *schema.ResourceData, meta interface{}) error {
 	catalogManagementClient, err := meta.(ClientSession).CatalogManagementV1()
@@ -185,9 +219,6 @@ func resourceIBMCmOfferingInstanceRead(d *schema.ResourceData, meta interface{})
 	}
 	if err = d.Set("crn", offeringInstance.CRN); err != nil {
 		return fmt.Errorf("Error setting crn: %s", err)
-	}
-	if err = d.Set("_rev", offeringInstance.Rev); err != nil {
-		return fmt.Errorf("Error setting _rev: %s", err)
 	}
 	if err = d.Set("label", offeringInstance.Label); err != nil {
 		return fmt.Errorf("Error setting label: %s", err)
@@ -218,8 +249,11 @@ func resourceIBMCmOfferingInstanceRead(d *schema.ResourceData, meta interface{})
 	if err = d.Set("cluster_all_namespaces", offeringInstance.ClusterAllNamespaces); err != nil {
 		return fmt.Errorf("Error setting cluster_all_namespaces: %s", err)
 	}
-	if err = d.Set("schematics_workspace_id", offeringInstance.SchematicsWorkspaceID); err != nil {
-		return fmt.Errorf("Error setting schematics_workspace_id: %s", err)
+	if err = d.Set("install_plan", offeringInstance.InstallPlan); err != nil {
+		return fmt.Errorf("Error setting install_plan: %s", err)
+	}
+	if err = d.Set("channel", offeringInstance.Channel); err != nil {
+		return fmt.Errorf("Error setting channel: %s", err)
 	}
 
 	return nil
@@ -282,6 +316,12 @@ func resourceIBMCmOfferingInstanceUpdate(d *schema.ResourceData, meta interface{
 	}
 	if _, ok := d.GetOk("resource_group_id"); ok {
 		putOfferingInstanceOptions.SetResourceGroupID(d.Get("resource_group_id").(string))
+	}
+	if _, ok := d.GetOk("install_plan"); ok {
+		putOfferingInstanceOptions.SetInstallPlan(d.Get("install_plan").(string))
+	}
+	if _, ok := d.GetOk("channel"); ok {
+		putOfferingInstanceOptions.SetChannel(d.Get("channel").(string))
 	}
 
 	_, response, err = catalogManagementClient.PutOfferingInstance(putOfferingInstanceOptions)
