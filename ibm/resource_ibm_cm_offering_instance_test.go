@@ -68,7 +68,7 @@ func testAccCheckIBMCmOfferingInstanceConfig(clusterId string, clusterRegion str
 			cluster_region = "%s"
 			cluster_namespaces = ["tf-cm-test"]
 			cluster_all_namespaces = false
-			wait_until_successful = false
+			wait_until_successful = true
 		}
 		`, clusterId, clusterRegion)
 }
