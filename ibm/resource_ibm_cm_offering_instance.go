@@ -7,9 +7,19 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/IBM/platform-services-go-sdk/catalogmanagementv1"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+)
+
+const (
+	inProgress = "in progress"
+	failed     = "failed"
+	success    = "succeeded"
+
+	waitUntilInterval = 10 * time.Second
+	waitUntilRetries  = 40
 )
 
 func resourceIBMCmOfferingInstance() *schema.Resource {
@@ -91,20 +101,21 @@ func resourceIBMCmOfferingInstance() *schema.Resource {
 			"install_plan": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
-				Default:     "automatic",
-				Description: "install plan for the subscription of the operator- can be either automatic or manual. Required for operator bundles",
+				Default:     "Automatic",
+				Description: "install plan for the subscription of the operator- can be either Automatic or Manual. Required for operator bundles",
 			},
 			"channel": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "channel to target for the operator subscription. Required for operator bundles",
 			},
-			/* 			"wait_until_successful": {
-				Type:        schema.TypeBool,
-				Optional:    true,
-				Default:     true,
-				Description: "Whether to wait until the offering instance successfully provisions, or to return when accepted",
-			}, */
+			"wait_until_successful": {
+				Type:             schema.TypeBool,
+				Optional:         true,
+				DiffSuppressFunc: applyOnce,
+				Default:          true,
+				Description:      "Whether to wait until the offering instance successfully provisions, or to return when accepted",
+			},
 		},
 	}
 }
@@ -173,26 +184,42 @@ func resourceIBMCmOfferingInstanceCreate(d *schema.ResourceData, meta interface{
 
 	d.SetId(*offeringInstance.ID)
 
-	/* 	if wait_until_successful {
+	if d.Get("wait_until_successful").(bool) {
 		if err = waitUntilSuccess(d, meta); err != nil {
-			log.Printf("[DEBUG] CreateOfferingInstance failed %s\n%s", err, response)
+			log.Print(err)
 			return err
 		}
-	} */
+	}
 
 	log.Printf("LOG2 Service version instance of type %q was created on cluster %q", *createOfferingInstanceOptions.KindFormat, *createOfferingInstanceOptions.ClusterID)
 
 	return resourceIBMCmOfferingInstanceRead(d, meta)
 }
 
-/* func waitUntilSuccess(d *schema.ResourceData, meta interface{}) error {
+func waitUntilSuccess(d *schema.ResourceData, meta interface{}) error {
+	catalogManagementClient, err := meta.(ClientSession).CatalogManagementV1()
+	if err != nil {
+		return err
+	}
 	getOfferingInstanceOptions := &catalogmanagementv1.GetOfferingInstanceOptions{}
 
 	getOfferingInstanceOptions.SetInstanceIdentifier(d.Id())
 
-	for offeringInstance, response, err := catalogManagementClient.GetOfferingInstance(getOfferingInstanceOptions); offeringInstance
+	for retries := 0; retries > waitUntilRetries; retries++ {
+		offeringInstance, response, err := catalogManagementClient.GetOfferingInstance(getOfferingInstanceOptions)
+		if err != nil {
+			log.Printf("[Debug] Get offering instance (%s) failed while waiting until provision was successful: %s", d.Id(), err)
+		} else if *offeringInstance.LastOperation.State == inProgress {
+			continue
+		} else if *offeringInstance.LastOperation.State == failed {
+			return fmt.Errorf("Offering instance provisioning failed %s\n%s", err, response)
+		} else if *offeringInstance.LastOperation.State == success {
+			return nil
+		}
+	}
 
-} */
+	return fmt.Errorf("Timed out waiting for offering instance status (%s) to be successful", d.Id())
+}
 
 func resourceIBMCmOfferingInstanceRead(d *schema.ResourceData, meta interface{}) error {
 	catalogManagementClient, err := meta.(ClientSession).CatalogManagementV1()
