@@ -30,9 +30,10 @@ func TestAccIBMCmOfferingInstance(t *testing.T) {
 				),
 			},
 			resource.TestStep{
-				ResourceName:      "ibm_cm_offering_instance.cm_offering_instance",
-				ImportState:       true,
-				ImportStateVerify: true,
+				ResourceName:            "ibm_cm_offering_instance.cm_offering_instance",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"wait_until_successful"},
 			},
 		},
 	})
@@ -67,6 +68,7 @@ func testAccCheckIBMCmOfferingInstanceConfig(clusterId string, clusterRegion str
 			cluster_region = "%s"
 			cluster_namespaces = ["tf-cm-test"]
 			cluster_all_namespaces = false
+			wait_until_successful = false
 		}
 		`, clusterId, clusterRegion)
 }
