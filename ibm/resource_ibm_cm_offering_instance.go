@@ -206,6 +206,7 @@ func waitUntilSuccess(d *schema.ResourceData, meta interface{}) error {
 	getOfferingInstanceOptions.SetInstanceIdentifier(d.Id())
 
 	for retries := 0; retries > waitUntilRetries; retries++ {
+		time.Sleep(waitUntilInterval)
 		offeringInstance, response, err := catalogManagementClient.GetOfferingInstance(getOfferingInstanceOptions)
 		if err != nil {
 			log.Printf("[Debug] Get offering instance (%s) failed while waiting until provision was successful: %s", d.Id(), err)
